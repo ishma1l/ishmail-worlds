@@ -76,7 +76,7 @@
   const fmt = s => isFinite(s) ? `${Math.floor(s / 60)}:${pad(Math.floor(s % 60))}` : '0:00';
   function trackTick() {
     const st = Media.FEAT.porsche;
-    if (st && st.mode === 'local') {
+    if (st && (st.mode === 'local' || st.mode === 'standin') && st.video) {
       const v = st.video, p = v.duration ? v.currentTime / v.duration : 0;
       trackPath.style.strokeDashoffset = plen * (1 - p); const pt = trackPath.getPointAtLength(plen * p); car.setAttribute('cx', pt.x); car.setAttribute('cy', pt.y);
       $('.p-time').textContent = `${fmt(v.currentTime)} / ${fmt(v.duration)}`; $('.p-track').classList.remove('hidden');
@@ -127,13 +127,14 @@
     if (el.classList.contains('tb-sound')) return Sound.muted ? 'Sound on' : 'Sound off';
     if (el.classList.contains('open-original')) return el.textContent;
     if (el.classList.contains('featured')) { const st = Media.FEAT[state.world];
-      if (st.mode === 'local') return 'Watch with sound'; if (st.cfg.platform === 'TikTok' && st.mode === 'embed') return 'Play / pause'; return `Open on ${st.cfg.platform}`; }
+      if (st.mode === 'local') return 'Watch with sound'; if (st.mode === 'standin') return 'Full screen'; if (st.cfg.platform === 'TikTok' && st.mode === 'embed') return 'Play / pause'; return `Open on ${st.cfg.platform}`; }
     if (el.classList.contains('l-row')) return el.classList.contains('active') ? 'Full screen' : 'Show';
     return 'Full screen';
   }
   function hint() {
     const h = $('#hint');
-    h.innerHTML = `<span><b>◀ ▶</b>Worlds</span><span><b>▲ ▼</b>Select</span><span><b>OK</b>${okLabel(state.focusEl)}</span>`;
+    const i = ORDER.indexOf(state.world), nm = w => TITLES[w].replace(/<[^>]+>/g, '').replace('&amp;', '&');
+    h.innerHTML = `<span><b>◀</b>${nm(ORDER[(i + 2) % 3])}</span><span><b>▶</b>${nm(ORDER[(i + 1) % 3])}</span><span><b>▲ ▼</b>Select</span><span><b>OK</b>${okLabel(state.focusEl)}</span>`;
     h.classList.remove('idle'); clearTimeout(hintT); hintT = setTimeout(() => h.classList.add('idle'), 5000);
     app.classList.add('show-edges'); clearTimeout(hint.e); hint.e = setTimeout(() => app.classList.remove('show-edges'), 3500);
   }
@@ -225,6 +226,7 @@
     if (el.classList.contains('featured')) {
       const w = state.world, st = Media.FEAT[w];
       if (st.mode === 'local') return openTheatre(st.video.currentSrc, st.cfg.caption, w, st.video.currentTime);
+      if (st.mode === 'standin') return openTheatre(st.video.currentSrc, st.video.dataset.label, w, st.video.currentTime);
       if (st.mode === 'embed' && st.cfg.platform === 'TikTok') { st.playing = !st.playing; Media.tiktok(w, st.playing ? 'play' : 'pause'); return toast(st.playing ? 'Playing' : 'Paused'); }
       return openOriginal(w);
     }
@@ -236,7 +238,7 @@
     const el = state.focusEl; if (!el) return;
     if (el.classList.contains('featured')) {
       const st = Media.FEAT[state.world];
-      if (st.mode === 'local') { const v = st.video; v.paused ? (v.play(), delete v.dataset.user) : (v.pause(), v.dataset.user = 'paused'); return toast(v.paused ? 'Paused' : 'Playing'); }
+      if ((st.mode === 'local' || st.mode === 'standin') && st.video) { const v = st.video; v.paused ? (v.play(), delete v.dataset.user) : (v.pause(), v.dataset.user = 'paused'); return toast(v.paused ? 'Paused' : 'Playing'); }
       if (st.mode === 'embed') return activate(el);
     }
     const v = videoOf(el); if (v) { v.paused ? v.play().catch(() => {}) : v.pause(); toast(v.paused ? 'Paused' : 'Playing'); }

@@ -12,7 +12,7 @@ window.Media = (function () {
   }
   const KIND = ['yours', 'online', 'built-in'];
   function load(video, list, i = 0) {
-    if (i >= list.length) { video.dataset.kind = 'missing'; return; }
+    if (i >= list.length) { video.dataset.kind = 'missing'; video.dispatchEvent(new Event('exhausted')); return; }
     video.dataset.kind = KIND[Math.min(i, 2)];
     video.onerror = () => load(video, list, i + 1);
     video.muted = true; video.setAttribute('muted', ''); video.playsInline = true; video.preload = 'auto';
@@ -59,12 +59,20 @@ window.Media = (function () {
     v.addEventListener('loadeddata', () => { st.mode = 'local'; st.video = v; showOriginal(false); document.dispatchEvent(new CustomEvent('feat-ready', { detail: world })); }, { once: true });
     v.addEventListener('error', () => {
       v.remove();
-      if (!navigator.onLine || (f.platform === 'TikTok' && !f.tiktokId)) { card(); return; }
+      if (f.platform !== 'TikTok' || !f.tiktokId || !navigator.onLine) { standin(); return; }
       const { wrap, ifr } = embed(f, host.clientWidth || parseInt(getComputedStyle(host).width), host.clientHeight || parseInt(getComputedStyle(host).height));
       box.append(wrap); st.mode = 'embed'; st.iframe = ifr; showOriginal(true);
     }, { once: true });
     v.src = `assets/videos/${world}/${f.slot}.mp4`; box.append(v);
-    function card() { st.mode = 'card'; box.innerHTML = `<div class="feat-card"><b>${f.caption || 'Featured'}</b><span>Available on ${f.platform}</span></div>`; showOriginal(true); }
+    function card() { st.mode = 'card'; box.innerHTML = `<div class="feat-card"><b>${f.caption || 'Featured'}</b><span>On ${f.platform}</span></div>`; showOriginal(true); }
+    /* Instagram (or offline): play a matching clip here, with a clean button to open the reel */
+    function standin() {
+      if (!f.standin) return card();
+      const s = document.createElement('video'); load(s, [f.standin.stock && C.stockBase + f.standin.stock, f.standin.fallback && `assets/fallback/${f.standin.fallback}`].filter(Boolean));
+      s.loop = true; s.dataset.label = f.standin.label; box.append(s);
+      st.mode = 'standin'; st.video = s; host.querySelector('.hero-cap').textContent = f.standin.label; showOriginal(true);
+      s.addEventListener('exhausted', card, { once: true });
+    }
   }
   /* TikTok's embed player accepts play/pause commands from the page */
   function tiktok(world, type) {

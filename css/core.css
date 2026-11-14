@@ -114,3 +114,6 @@ body.lite .g-rain, body.lite .l-dust { display: none; }
 body.lite .world > .bg { filter: none !important; }
 body.lite * { backdrop-filter: none !important; }
 @media (prefers-reduced-motion: reduce) { * { animation-duration: .01s !important; animation-iteration-count: 1 !important; } }
+
+.edge span { display: none; }
+.edge { padding: 30px 16px; }

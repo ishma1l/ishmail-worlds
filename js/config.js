@@ -43,7 +43,9 @@ window.IW = {
         caption: "911 GT3 RS · after dark",
         original: "https://www.instagram.com/reel/Dbi7uqvJABz/",
         platform: "Instagram",
-        aspect: 1028 / 720
+        aspect: 1028 / 720,
+        // shown only if featured.mp4 is missing (Instagram embeds add white bars, so we never embed them)
+        standin: { label: "Night detail", stock: "29498807/12698160_1018_540_24fps.mp4", fallback: "drive_showroom.mp4" }
       },
       background: { slot: "background", stock: "29498824/12698131_1356_720_24fps.mp4", fallback: "drive_showroom.mp4" },
       screens: [
@@ -62,7 +64,8 @@ window.IW = {
         caption: "Night drive",
         original: "https://www.instagram.com/reel/DeAEWPmNvNb/",
         platform: "Instagram",
-        aspect: 1080 / 608
+        aspect: 1080 / 608,
+        standin: { label: "Grand touring", stock: "5309351/5309351-sd_960_540_25fps.mp4", fallback: "empire_golden.mp4" }
       },
       background: { slot: "background", stock: "34555902/14641676_1366_720_24fps.mp4", fallback: "empire_golden.mp4" },
       // Destinations: the clock beside each one is the real local time there.
