@@ -45,7 +45,7 @@ window.Remote = (function () {
     if (performance.now() - lastKeyAt > 350) handler('back', null);
     arm();
   });
-  function leave() { allowLeave = true; history.go(-2); }
+  function leave() { if (window.Android && Android.exit) return Android.exit(); allowLeave = true; history.go(-2); }
 
   /* Media keys routed through the OS media session (some remotes only do this) */
   if ('mediaSession' in navigator) {
@@ -59,5 +59,5 @@ window.Remote = (function () {
   let pt;
   document.addEventListener('mousemove', () => { document.body.classList.add('pointer'); clearTimeout(pt); pt = setTimeout(() => document.body.classList.remove('pointer'), 3000); });
 
-  return { on, arm, leave, action };
+  return { on, arm, leave, action, handle: a => handler(a, null) };
 })();

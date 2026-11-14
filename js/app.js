@@ -18,6 +18,14 @@
   const tvLike = /Android|SMART-TV|SmartTV|GoogleTV|AFT|BRAVIA|CrKey|Tizen|Web0S|NetCast|Nebula/i.test(navigator.userAgent) && !/Mobile/i.test(navigator.userAgent);
   const lite = q.has('lite') || (!q.has('full') && (tvLike || (navigator.hardwareConcurrency || 8) <= 4 || (navigator.deviceMemory || 8) <= 2));
   if (lite) document.body.classList.add('lite');
+  // screensaver mode (used by the projector app): no hints, worlds advance by themselves
+  const SS = q.has('screensaver'); if (SS) document.body.classList.add('screensaver');
+  let ssT;
+  function ssNext() {
+    if (!SS) return; clearTimeout(ssT);
+    const st = Media.FEAT[state.world], d = st && st.video && st.video.duration;
+    ssT = setTimeout(() => { if (!theatre.open) step(1); }, Math.max(30, Math.min(90, isFinite(d) ? d : 40)) * 1000);
+  }
   Media.setBudget(lite ? 4 : 6);
   if (Sound.muted) document.body.classList.add('muted');
   // self-tuning: if the screen can't keep up, switch to the lighter mode automatically
@@ -171,7 +179,7 @@
     setFocus(state.focus[w] && items(w).includes(state.focus[w]) ? state.focus[w] : items(w)[1], true);
     Media.schedule(inEl, state.focusEl);
     if (w === 'gotham') { FX.start('rain'); scheduleLightning(); } else FX.stop('rain');
-    heroAudio();
+    heroAudio(); setTimeout(ssNext, 1500);
     if (w === 'lifestyle') FX.start('gold'); else FX.stop('gold');
   }
   function step(dir) { if (state.busy) return; const i = ORDER.indexOf(state.world); enterWorld(ORDER[(i + dir + 3) % 3], dir); state.busy = true; setTimeout(() => state.busy = false, 650); }
@@ -388,6 +396,7 @@
     }
   };
 
+  window.__iwBack = () => Remote.handle('back');
   Remote.arm();
   intro.start();
   window.__iw = { state, theatre, intro, items, enterWorld, FEAT: Media.FEAT, lite };

@@ -45,6 +45,7 @@ window.IW = {
         original: "https://www.instagram.com/reel/Dbi7uqvJABz/",
         platform: "Instagram",
         aspect: 16 / 9,
+        playWithSound: true,           // plays with its own audio as soon as you arrive
         // shown only if featured.mp4 is missing (Instagram embeds add white bars, so we never embed them)
         standin: { label: "Tail lights", stock: "6157782/6157782-sd_960_540_30fps.mp4", fallback: "drive_showroom.mp4" }
       },
@@ -66,6 +67,7 @@ window.IW = {
         original: "https://www.instagram.com/reel/DeAEWPmNvNb/",
         platform: "Instagram",
         aspect: 16 / 9,
+        playWithSound: true,
         standin: { label: "Grand touring", stock: "5309351/5309351-sd_960_540_25fps.mp4", fallback: "empire_golden.mp4" }
       },
       background: { slot: "background", stock: "34555902/14641676_1366_720_24fps.mp4", fallback: "empire_golden.mp4" },

@@ -120,3 +120,5 @@ body.lite * { backdrop-filter: none !important; }
 
 /* your own footage plays clean: no caption over it */
 [data-kind="yours"] .mon-label, [data-kind="yours"] .p-cap, [data-kind="yours"] .l-cap { display: none; }
+
+body.screensaver #hint, body.screensaver .edge { display: none; }

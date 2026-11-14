@@ -145,10 +145,11 @@ window.Sound = (function () {
   let ducked = false;
   function level() { return muted ? 0 : (ducked ? .12 : .8); }
   try { muted = localStorage.getItem('iw-muted') === '1'; } catch (e) {}
+  const quiet = () => {};
   return {
+    tick: quiet, whoosh: quiet, boom: quiet, thunder: quiet, typeBlip: quiet, rev: quiet, chime: quiet, world: quiet,
     duck(on) { ducked = on; if (master) master.gain.setTargetAtTime(level(), ctx.currentTime, .3); },
-    init, tick, whoosh, boom, thunder, typeBlip, rev, chime,
-    world(name) { cityBed(name === 'gotham'); driveBed(name === 'porsche'); empireBed(name === 'lifestyle'); },
+    init,
     toggleMute() { muted = !muted; try { localStorage.setItem('iw-muted', muted ? '1' : '0'); } catch (e) {} if (master) master.gain.setTargetAtTime(level(), ctx.currentTime, .1); return muted; },
     get muted() { return muted; }, get running() { return ready(); }
   };
