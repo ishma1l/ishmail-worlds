@@ -1,0 +1,106 @@
+/* ============================== WORLD 1: DARK CITY ==============================
+   Cold steel blue, condensed type, surveillance HUD, rain, searchlights. */
+#world-city { background: #02040a; font-family: 'JetBrains Mono', monospace; color: #cfe3ff; }
+#world-city .w-bg { filter: brightness(.55) saturate(.7) contrast(1.15); transform: scale(1.04); }
+.city-rain { position: absolute; inset: 0; z-index: 4; pointer-events: none; }
+.city-flash { position: absolute; inset: 0; z-index: 5; background: radial-gradient(ellipse at 40% 0%, rgba(210,225,255,.9), rgba(160,190,255,.25) 60%, transparent);
+  opacity: 0; pointer-events: none; mix-blend-mode: screen; }
+.city-vignette { position: absolute; inset: 0; z-index: 2; pointer-events: none;
+  background: radial-gradient(ellipse at center, transparent 45%, rgba(0,0,6,.85) 100%), linear-gradient(180deg, rgba(0,0,0,.6), transparent 18%, transparent 80%, rgba(0,0,0,.8)); }
+.city-beam { position: absolute; bottom: -80px; width: 260px; height: 1500px; z-index: 1; transform-origin: 50% 100%; pointer-events: none;
+  background: linear-gradient(0deg, rgba(220,235,255,.32), rgba(200,220,255,.08) 60%, transparent); clip-path: polygon(46% 100%, 54% 100%, 100% 0, 0 0);
+  filter: blur(6px); mix-blend-mode: screen; }
+.city-beam.b1 { left: 330px; animation: sweep1 11s ease-in-out infinite alternate; }
+.city-beam.b2 { right: 300px; animation: sweep2 14s ease-in-out infinite alternate; }
+@keyframes sweep1 { from { transform: rotate(-28deg) } to { transform: rotate(14deg) } }
+@keyframes sweep2 { from { transform: rotate(24deg) } to { transform: rotate(-16deg) } }
+
+.city-top { position: absolute; top: 34px; left: 60px; right: 60px; z-index: 6; display: flex; justify-content: space-between; align-items: flex-start; }
+.city-brand { display: flex; flex-direction: column; gap: 8px; }
+.city-title { position: relative; font: 700 84px/0.9 'Oswald'; letter-spacing: .04em; color: #eaf2ff; text-shadow: 0 0 40px rgba(70,140,255,.45); }
+.city-title::before, .city-title::after { content: attr(data-text); position: absolute; inset: 0; opacity: 0; }
+.city-title::before { color: #49a1ff; animation: glitch 7s infinite steps(1); }
+.city-title::after { color: #ff3355; animation: glitch 7s .08s infinite steps(1); }
+@keyframes glitch { 0%, 92%, 100% { opacity: 0; transform: none } 93% { opacity: .7; transform: translate(-5px, 2px); clip-path: inset(10% 0 55% 0) }
+  95% { opacity: .7; transform: translate(4px, -2px); clip-path: inset(60% 0 8% 0) } 97% { opacity: 0 } }
+.city-subtitle { font-size: 15px; letter-spacing: .3em; color: #8fb6e8; }
+.city-subtitle i { color: #3b6fb5; font-style: normal; }
+.rec { color: #ff3b4f; font-weight: 700; animation: blink 1.4s steps(1) infinite; }
+@keyframes blink { 50% { opacity: .25 } }
+.city-clock { text-align: right; display: flex; flex-direction: column; gap: 6px; }
+.city-clock span { font: 300 64px/1 'Oswald'; letter-spacing: .06em; color: #eaf2ff; font-variant-numeric: tabular-nums; }
+.city-clock small { font-size: 14px; letter-spacing: .35em; color: #8fb6e8; }
+
+.city-col { position: absolute; top: 168px; width: 450px; display: flex; flex-direction: column; gap: 22px; z-index: 6; }
+.city-col.left { left: 60px; }
+.city-col.right { right: 60px; }
+.city-center { position: absolute; top: 168px; left: 540px; width: 840px; height: 820px; z-index: 6; display: flex; justify-content: center; align-items: center; }
+
+/* HUD panel */
+.cpanel { background: #01030a; border: 1px solid rgba(110,170,255,.28); box-shadow: 0 0 0 1px rgba(0,0,0,.6), 0 20px 50px rgba(0,0,0,.7);
+  transition: transform .4s, border-color .4s, box-shadow .4s; }
+.cpanel video { filter: saturate(.75) contrast(1.1) hue-rotate(-8deg); }
+.cpanel::before { content: ''; position: absolute; inset: 0; z-index: 2; pointer-events: none;
+  background: repeating-linear-gradient(0deg, rgba(0,0,0,.25) 0 1px, transparent 1px 3px), linear-gradient(180deg, rgba(0,0,0,.55), transparent 25%, transparent 75%, rgba(0,0,0,.6)); }
+.cpanel .hud-c { position: absolute; width: 22px; height: 22px; z-index: 3; border: 2px solid #6fb4ff; }
+.cpanel .hud-c.tl { top: 8px; left: 8px; border-right: 0; border-bottom: 0 }
+.cpanel .hud-c.tr { top: 8px; right: 8px; border-left: 0; border-bottom: 0 }
+.cpanel .hud-c.bl { bottom: 8px; left: 8px; border-right: 0; border-top: 0 }
+.cpanel .hud-c.br { bottom: 8px; right: 8px; border-left: 0; border-top: 0 }
+.cpanel .c-label { position: absolute; top: 14px; left: 40px; z-index: 3; font-size: 13px; letter-spacing: .22em; color: #dbe9ff; }
+.cpanel .c-label::before { content: '●'; color: #ff3b4f; margin-right: 8px; animation: blink 1.4s steps(1) infinite; }
+.cpanel .c-time { position: absolute; bottom: 14px; right: 40px; z-index: 3; font-size: 12px; letter-spacing: .15em; color: #9cc3f5; font-variant-numeric: tabular-nums; }
+.cpanel .p-hint { z-index: 4; bottom: 34px; left: 40px; color: #ffd27a; }
+.cpanel:focus, .cpanel.focus { border-color: #8fc6ff; transform: scale(1.025); box-shadow: 0 0 0 2px rgba(120,190,255,.6), 0 0 50px rgba(70,140,255,.35); }
+.city-col .cpanel.h-l { height: 330px; }
+.city-col .cpanel.h-m { height: 236px; }
+
+/* Featured: case-file frame */
+.city-featured { position: relative; }
+.city-featured .feat { align-items: stretch; }
+.city-featured .feat-screen { width: 620px; height: 640px; border: 1px solid rgba(140,190,255,.5);
+  box-shadow: 0 0 0 8px rgba(2,6,14,.85), 0 0 0 9px rgba(110,170,255,.3), 0 30px 120px rgba(0,0,0,.9), 0 0 120px rgba(40,100,220,.25); }
+.city-featured .feat-label { position: absolute; top: -2px; left: -2px; transform: translateY(-100%); padding: 8px 14px; background: #6fb4ff; color: #02040a;
+  font: 700 14px 'JetBrains Mono'; letter-spacing: .2em; }
+.city-featured .feat-side { width: 190px; color: #cfe3ff; }
+.city-featured .feat-side .side-title { font: 500 34px/1.05 'Oswald'; letter-spacing: .04em; text-transform: uppercase; color: #fff; }
+.city-featured .feat-side .side-meta { font-size: 12px; line-height: 1.8; letter-spacing: .15em; color: #8fb6e8; }
+.city-featured .feat-open { color: #6fb4ff; font-family: 'JetBrains Mono'; font-size: 13px; }
+.city-featured .feat-fallback { background: radial-gradient(ellipse at 50% 30%, rgba(40,90,180,.35), #01030a 70%); color: #dbe9ff; }
+.city-featured .feat-fallback h3 { font: 600 34px 'Oswald'; letter-spacing: .06em; }
+.city-featured.focus .feat-screen { box-shadow: 0 0 0 8px rgba(2,6,14,.85), 0 0 0 10px #8fc6ff, 0 30px 120px rgba(0,0,0,.9), 0 0 140px rgba(60,130,255,.5); }
+
+/* Quote intercept panel */
+.city-quote { position: relative; height: 330px; padding: 26px 30px; background: rgba(1,4,12,.82); border: 1px solid rgba(110,170,255,.28);
+  display: flex; flex-direction: column; overflow: hidden; }
+.city-quote::after { content: ''; position: absolute; left: 0; right: 0; height: 80px; top: -80px;
+  background: linear-gradient(180deg, transparent, rgba(111,180,255,.12), transparent); animation: scan 4s linear infinite; }
+@keyframes scan { to { top: 110% } }
+.cq-head { display: flex; justify-content: space-between; font-size: 12px; letter-spacing: .3em; color: #6fb4ff; }
+.cq-text { flex: 1; display: flex; align-items: center; white-space: normal; font: 500 36px/1.12 'Oswald'; text-transform: uppercase; color: #f2f7ff; letter-spacing: .01em; }
+.cq-text .cq-inner { display: block; }
+.cq-text .ch { opacity: 0; display: inline; }
+.cq-text .ch.on { opacity: 1; text-shadow: 0 0 18px rgba(120,180,255,.6); }
+.cq-text .cursor { display: inline-block; width: .5em; height: .9em; background: #6fb4ff; margin-left: 4px; vertical-align: -0.08em; animation: blink 1s steps(1) infinite; }
+.cq-by { font-size: 12px; letter-spacing: .3em; color: #8fb6e8; margin-bottom: 14px; }
+.cq-wave { display: flex; gap: 5px; align-items: flex-end; height: 26px; }
+.cq-wave i { flex: 1; background: #6fb4ff; opacity: .7; height: 20%; animation: wave .9s ease-in-out infinite alternate; }
+.cq-wave i:nth-child(odd) { animation-duration: .6s } .cq-wave i:nth-child(3n) { animation-duration: 1.2s }
+@keyframes wave { to { height: 100% } }
+.city-quote.speaking .cq-wave i { opacity: 1; }
+.city-quote:not(.speaking) .cq-wave i { animation-play-state: paused; height: 12%; }
+
+.city-ticker { position: absolute; left: 0; right: 0; bottom: 0; height: 44px; z-index: 6; overflow: hidden; background: rgba(1,4,12,.85);
+  border-top: 1px solid rgba(110,170,255,.3); display: flex; align-items: center; }
+.ticker-track { white-space: nowrap; font-size: 14px; letter-spacing: .28em; color: #8fb6e8; animation: tick 60s linear infinite; padding-left: 100%; }
+.ticker-track b { color: #ff3b4f; font-weight: 700; margin: 0 26px; }
+@keyframes tick { to { transform: translateX(-100%) } }
+
+#world-city.arrive .city-col.left { animation: inL 1.2s .2s cubic-bezier(.2,.8,.2,1) both; }
+#world-city.arrive .city-col.right { animation: inR 1.2s .3s cubic-bezier(.2,.8,.2,1) both; }
+#world-city.arrive .city-center { animation: inC 1.4s .1s cubic-bezier(.2,.8,.2,1) both; }
+#world-city.arrive .city-top { animation: inT 1s .5s both; }
+@keyframes inL { from { opacity: 0; transform: translateX(-120px) } }
+@keyframes inR { from { opacity: 0; transform: translateX(120px) } }
+@keyframes inC { from { opacity: 0; transform: scale(.92); filter: brightness(3) blur(8px) } }
+@keyframes inT { from { opacity: 0; transform: translateY(-30px) } }

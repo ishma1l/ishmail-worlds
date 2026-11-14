@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Ishmail Worlds</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="css/fonts.css">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/intro-hub.css">
+<link rel="stylesheet" href="css/city.css">
+<link rel="stylesheet" href="css/drive.css">
+<link rel="stylesheet" href="css/empire.css">
+</head>
+<body>
+<div id="viewport">
+<div id="stage">
+
+  <!-- ============================== INTRO ============================== -->
+  <section id="intro" class="screen active">
+    <canvas id="introCanvas" width="1920" height="1080"></canvas>
+    <div class="intro-line"></div>
+    <h1 class="intro-title" id="introTitle"></h1>
+    <div class="intro-sub">THREE WORLDS ARE WAITING</div>
+    <div class="intro-hint">PRESS <b>ENTER</b> OR CLICK</div>
+  </section>
+
+  <!-- ============================== HUB ============================== -->
+  <section id="hub" class="screen">
+    <video class="hub-bg" src="media/city/city_searchlight.mp4" muted loop playsinline></video>
+    <header class="hub-top">
+      <div class="hub-greet"><span class="hub-greet-small">Good evening</span><span class="hub-greet-name">Ishmail</span></div>
+      <div class="hub-clock"><span class="clock-hm" data-clock="hm"></span><span class="clock-date" data-clock="date"></span></div>
+    </header>
+
+    <div class="portals">
+      <button class="portal portal-city" data-world="city">
+        <div class="portal-frame">
+          <video src="media/city/city_rain.mp4" muted loop playsinline></video>
+          <canvas class="portal-rain" width="520" height="780"></canvas>
+          <div class="portal-beam"></div>
+        </div>
+        <div class="portal-copy">
+          <span class="portal-num">01</span>
+          <span class="portal-title">DARK CITY</span>
+          <span class="portal-sub">Night &middot; Rain &middot; Watch</span>
+        </div>
+      </button>
+
+      <button class="portal portal-drive" data-world="drive">
+        <div class="portal-frame">
+          <video src="media/drive/drive_tunnel.mp4" muted loop playsinline></video>
+          <div class="portal-redline"></div>
+        </div>
+        <div class="portal-copy">
+          <span class="portal-num">02</span>
+          <span class="portal-title">DRIVE</span>
+          <span class="portal-sub">SPEED &middot; SOUND &middot; STEEL</span>
+        </div>
+      </button>
+
+      <button class="portal portal-empire" data-world="empire">
+        <div class="portal-frame">
+          <video src="media/empire/empire_golden.mp4" muted loop playsinline></video>
+        </div>
+        <div class="portal-copy">
+          <span class="portal-num">III</span>
+          <span class="portal-title">Empire</span>
+          <span class="portal-sub">Business &middot; Travel &middot; Time</span>
+        </div>
+      </button>
+    </div>
+
+    <footer class="keys">
+      <span><kbd>&larr;</kbd><kbd>&rarr;</kbd> choose</span>
+      <span><kbd>Enter</kbd> enter world</span>
+      <span><kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> jump</span>
+      <span><kbd>F</kbd> fullscreen</span>
+      <span><kbd>M</kbd> sound</span>
+      <span><kbd>?</kbd> all controls</span>
+    </footer>
+  </section>
+
+  <!-- ============================== WORLD 1: DARK CITY ============================== -->
+  <section id="world-city" class="screen world">
+    <video class="w-bg" muted loop playsinline></video>
+    <div class="city-beam b1"></div><div class="city-beam b2"></div>
+    <canvas class="city-rain" width="1920" height="1080"></canvas>
+    <div class="city-flash"></div>
+    <div class="city-vignette"></div>
+
+    <header class="city-top">
+      <div class="city-brand">
+        <span class="city-title" data-text="DARK CITY">DARK CITY</span>
+        <span class="city-subtitle">NIGHT OPERATIONS <i>//</i> SECTOR 07 <i>//</i> <b class="rec">● LIVE</b></span>
+      </div>
+      <div class="city-clock">
+        <span data-clock="hms"></span>
+        <small data-clock="dateUpper"></small>
+      </div>
+    </header>
+
+    <div class="city-col left" data-slot="left"></div>
+    <div class="city-center">
+      <div class="city-featured" data-featured="city"></div>
+    </div>
+    <div class="city-col right" data-slot="right">
+      <div class="city-quote" tabindex="-1">
+        <div class="cq-head"><span>INTERCEPT</span><span class="cq-count"></span></div>
+        <blockquote class="cq-text"></blockquote>
+        <div class="cq-by"></div>
+        <div class="cq-wave"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      </div>
+    </div>
+    <div class="city-ticker"><div class="ticker-track"></div></div>
+  </section>
+
+  <!-- ============================== WORLD 2: DRIVE ============================== -->
+  <section id="world-drive" class="screen world">
+    <video class="w-bg" muted loop playsinline></video>
+    <div class="drive-shade"></div>
+    <div class="drive-topline"></div>
+
+    <header class="drive-top">
+      <div class="drive-mark"><span class="drive-word">DRIVE</span><span class="drive-sweep"></span></div>
+      <div class="drive-tag"></div>
+      <div class="drive-clock"><span class="dc-hm" data-clock="hm"></span><span class="dc-s" data-clock="s"></span><small data-clock="dayUpper"></small></div>
+    </header>
+
+    <div class="drive-feature" data-featured="drive"></div>
+    <div class="drive-bays" data-slot="bays"></div>
+
+    <div class="drive-rev">
+      <div class="rev-leds"></div>
+      <div class="rev-readout"><span class="rev-num">0900</span><small>RPM</small></div>
+      <div class="rev-hint"><kbd>R</kbd> REV &nbsp; <kbd>Space</kbd> PAUSE</div>
+    </div>
+  </section>
+
+  <!-- ============================== WORLD 3: EMPIRE ============================== -->
+  <section id="world-empire" class="screen world">
+    <video class="w-bg" muted loop playsinline></video>
+    <div class="empire-wash"></div>
+    <canvas class="empire-dust" width="1920" height="1080"></canvas>
+
+    <header class="empire-top">
+      <div class="empire-loc">London</div>
+      <div class="empire-mark">
+        <span class="em-title">Empire</span>
+        <span class="em-sub">Business &nbsp;·&nbsp; Travel &nbsp;·&nbsp; Time &nbsp;·&nbsp; Form</span>
+      </div>
+      <div class="empire-clock"><span data-clock="hm12"></span><small data-clock="dateLong"></small></div>
+    </header>
+
+    <div class="empire-left">
+      <div class="empire-quote">
+        <span class="eq-mark">&ldquo;</span>
+        <p class="eq-text"></p>
+        <div class="eq-by"><i></i><span></span></div>
+      </div>
+      <div class="empire-slot-coast" data-slot="coast"></div>
+    </div>
+    <div class="empire-feature" data-featured="empire"></div>
+    <div class="empire-right" data-slot="right"></div>
+    <div class="empire-watch-slot" data-slot="watch"></div>
+  </section>
+
+  <!-- ============================== OVERLAYS ============================== -->
+  <div id="lightbox" class="overlay">
+    <div class="lb-inner"><div class="lb-media"></div><div class="lb-title"></div><div class="lb-close"><kbd>Esc</kbd> close</div></div>
+  </div>
+
+  <div id="help" class="overlay">
+    <div class="help-card">
+      <h2>Controls</h2>
+      <div class="help-grid">
+        <div class="hr"><span class="k"><kbd>1</kbd><kbd>2</kbd><kbd>3</kbd></span><span>Jump to Dark City / Drive / Empire</span></div>
+        <div class="hr"><span class="k"><kbd>Esc</kbd></span><span>Back to world selection (or close a panel)</span></div>
+        <div class="hr"><span class="k"><kbd>&larr;</kbd><kbd>&rarr;</kbd><kbd>&uarr;</kbd><kbd>&darr;</kbd></span><span>Move between portals or media panels</span></div>
+        <div class="hr"><span class="k"><kbd>Enter</kbd></span><span>Enter a world / expand the selected panel</span></div>
+        <div class="hr"><span class="k"><kbd>O</kbd></span><span>Open the featured reel on TikTok / Instagram</span></div>
+        <div class="hr"><span class="k"><kbd>C</kbd></span><span>Instagram: video only / full post</span></div>
+        <div class="hr"><span class="k"><kbd>Space</kbd></span><span>Pause / play all videos in the world</span></div>
+        <div class="hr"><span class="k"><kbd>M</kbd></span><span>Sound on / off</span></div>
+        <div class="hr"><span class="k"><kbd>F</kbd></span><span>Fullscreen</span></div>
+        <div class="hr"><span class="k"><kbd>Q</kbd></span><span>Next quote</span></div>
+        <div class="hr"><span class="k"><kbd>L</kbd></span><span>Lightning (Dark City)</span></div>
+        <div class="hr"><span class="k"><kbd>R</kbd></span><span>Rev the engine (Drive)</span></div>
+        <div class="hr"><span class="k"><kbd>?</kbd></span><span>Show / hide this help</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="veil"></div>
+  <div id="toast"></div>
+</div>
+</div>
+
+<script src="js/config.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/effects.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
