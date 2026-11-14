@@ -127,7 +127,7 @@
     if (el.classList.contains('tb-sound')) return Sound.muted ? 'Sound on' : 'Sound off';
     if (el.classList.contains('open-original')) return el.textContent;
     if (el.classList.contains('featured')) { const st = Media.FEAT[state.world];
-      if (st.mode === 'local') return st.cfg.playWithSound ? 'Full screen' : 'Watch with sound'; if (st.mode === 'standin') return 'Full screen'; if (st.cfg.platform === 'TikTok' && st.mode === 'embed') return 'Play / pause'; return `Open on ${st.cfg.platform}`; }
+      if (st.mode === 'local') return st.cfg.playWithSound ? 'Full screen' : 'Watch with sound'; if (st.mode === 'standin') return 'Full screen'; if (st.cfg.platform === 'TikTok' && st.mode === 'embed') return 'Pause / play'; return `Open on ${st.cfg.platform}`; }
     if (el.classList.contains('l-row')) return el.classList.contains('active') ? 'Full screen' : 'Show';
     return 'Full screen';
   }
@@ -180,7 +180,10 @@
   /* Featured clips that play with their own sound (Gotham) — only while you're in that world */
   function heroAudio() {
     ORDER.forEach(w => {
-      const st = Media.FEAT[w]; if (!st || !st.cfg.playWithSound || st.mode !== 'local') return;
+      const st = Media.FEAT[w]; if (!st || !st.cfg.playWithSound) return;
+      if (st.mode === 'embed') { const want = state.screen === 'world' && state.world === w && !Sound.muted && !theatre.open && state.firstInput;
+        Media.tiktok(w, 'play'); Media.tiktok(w, want ? 'unMute' : 'mute'); return; }
+      if (st.mode !== 'local') return;
       const v = st.video, want = state.screen === 'world' && state.world === w && !Sound.muted && !theatre.open && state.firstInput;
       if (want) { v.muted = false; if (v.paused && !v.dataset.user) v.play().catch(() => { v.muted = true; v.play().catch(() => {}); }); }
       else v.muted = true;
@@ -238,7 +241,7 @@
       const w = state.world, st = Media.FEAT[w];
       if (st.mode === 'local') return openTheatre(st.video.currentSrc, st.cfg.caption, w, st.video.currentTime);
       if (st.mode === 'standin') return openTheatre(st.video.currentSrc, st.video.dataset.label, w, st.video.currentTime);
-      if (st.mode === 'embed' && st.cfg.platform === 'TikTok') { st.playing = !st.playing; Media.tiktok(w, st.playing ? 'play' : 'pause'); return toast(st.playing ? 'Playing' : 'Paused'); }
+      if (st.mode === 'embed' && st.cfg.platform === 'TikTok') { st.paused = !st.paused; Media.tiktok(w, st.paused ? 'pause' : 'play'); return toast(st.paused ? 'Paused' : 'Playing'); }
       return openOriginal(w);
     }
     if (el.classList.contains('l-row') && !el.classList.contains('active')) return setDest(+el.dataset.i);

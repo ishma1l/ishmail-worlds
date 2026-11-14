@@ -31,14 +31,16 @@ window.Media = (function () {
   }
 
   /* ---------- featured reels ---------- */
-  function tiktokUrl(id) { return `https://www.tiktok.com/player/v1/${id}?autoplay=1&loop=1&music_info=0&description=0&rel=0&controls=1&progress_bar=1&play_button=1&volume_control=1&fullscreen_button=0&timestamp=0&native_context_menu=0&closed_caption=0`; }
+  /* TikTok's player with every control hidden, so it plays like a built-in video */
+  function tiktokUrl(id) { return `https://www.tiktok.com/player/v1/${id}?autoplay=1&loop=1&controls=0&progress_bar=0&play_button=0&volume_control=0&fullscreen_button=0&timestamp=0&music_info=0&description=0&rel=0&native_context_menu=0&closed_caption=0`; }
   function igUrl(link) { const m = link.match(/\/(?:reel|p)\/([^/?#]+)/); return m ? `https://www.instagram.com/reel/${m[1]}/embed/` : null; }
   /* Instagram's embed = 54px header + 4:5 media box (video centred) + footer. We frame just the video. */
   function embed(f, SW, SH) {
     const wrap = document.createElement('div'); wrap.style.cssText = 'position:absolute;inset:0;overflow:hidden;background:#000';
     const ifr = document.createElement('iframe'); ifr.tabIndex = -1; ifr.setAttribute('scrolling', 'no');
     ifr.allow = 'autoplay; encrypted-media; fullscreen; picture-in-picture'; ifr.referrerPolicy = 'strict-origin-when-cross-origin';
-    if (f.platform === 'TikTok') { ifr.src = tiktokUrl(f.tiktokId); ifr.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;border:0'; }
+    if (f.platform === 'TikTok') { ifr.src = tiktokUrl(f.tiktokId); ifr.style.cssText = 'position:absolute;left:-2%;top:-2%;width:104%;height:104%;border:0;pointer-events:none';
+      ifr.addEventListener('load', () => { const s = t => { try { ifr.contentWindow.postMessage({ type: t, 'x-tiktok-player': true }, '*'); } catch (e) {} }; s('mute'); s('play'); setTimeout(() => { s('mute'); s('play'); }, 1500); document.dispatchEvent(new CustomEvent('feat-ready', { detail: 'tiktok' })); }); }
     else {
       ifr.src = igUrl(f.original);
       let vw = SW, vh = SW / f.aspect; if (vh > SH) { vh = SH; vw = SH * f.aspect; }
