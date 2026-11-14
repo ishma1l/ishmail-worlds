@@ -127,7 +127,7 @@
     if (el.classList.contains('tb-sound')) return Sound.muted ? 'Sound on' : 'Sound off';
     if (el.classList.contains('open-original')) return el.textContent;
     if (el.classList.contains('featured')) { const st = Media.FEAT[state.world];
-      if (st.mode === 'local') return 'Watch with sound'; if (st.mode === 'standin') return 'Full screen'; if (st.cfg.platform === 'TikTok' && st.mode === 'embed') return 'Play / pause'; return `Open on ${st.cfg.platform}`; }
+      if (st.mode === 'local') return st.cfg.playWithSound ? 'Full screen' : 'Watch with sound'; if (st.mode === 'standin') return 'Full screen'; if (st.cfg.platform === 'TikTok' && st.mode === 'embed') return 'Play / pause'; return `Open on ${st.cfg.platform}`; }
     if (el.classList.contains('l-row')) return el.classList.contains('active') ? 'Full screen' : 'Show';
     return 'Full screen';
   }
@@ -165,6 +165,7 @@
     setFocus(state.focus[w] && items(w).includes(state.focus[w]) ? state.focus[w] : items(w)[1], true);
     Media.schedule(inEl, state.focusEl);
     if (w === 'gotham') { FX.start('rain'); scheduleLightning(); } else FX.stop('rain');
+    heroAudio();
     if (w === 'lifestyle') FX.start('gold'); else FX.stop('gold');
   }
   function step(dir) { if (state.busy) return; const i = ORDER.indexOf(state.world); enterWorld(ORDER[(i + dir + 3) % 3], dir); state.busy = true; setTimeout(() => state.busy = false, 650); }
@@ -173,9 +174,19 @@
   let lt;
   function lightning() {
     $('.g-flash').animate([{ opacity: 0 }, { opacity: .9, offset: .06 }, { opacity: .1, offset: .16 }, { opacity: .65, offset: .26 }, { opacity: 0 }], { duration: 1000, easing: 'ease-out' });
-    setTimeout(() => Sound.thunder(), 400 + Math.random() * 600);
   }
   function scheduleLightning() { clearTimeout(lt); lt = setTimeout(() => { if (state.world === 'gotham' && state.screen === 'world' && !theatre.open) lightning(); scheduleLightning(); }, 9000 + Math.random() * 15000); }
+
+  /* Featured clips that play with their own sound (Gotham) — only while you're in that world */
+  function heroAudio() {
+    ORDER.forEach(w => {
+      const st = Media.FEAT[w]; if (!st || !st.cfg.playWithSound || st.mode !== 'local') return;
+      const v = st.video, want = state.screen === 'world' && state.world === w && !Sound.muted && !theatre.open && state.firstInput;
+      if (want) { v.muted = false; if (v.paused && !v.dataset.user) v.play().catch(() => { v.muted = true; v.play().catch(() => {}); }); }
+      else v.muted = true;
+    });
+  }
+  document.addEventListener('feat-ready', heroAudio);
 
   /* ---------------- full-screen player ---------------- */
   const th = $('#theatre'), thBtns = $$('.th-btn', th);
@@ -192,12 +203,12 @@
     theatre.featuredWorld = featuredWorld; $('[data-act="original"]', th).classList.toggle('hidden', !featuredWorld);
     $('[data-act="sound"]', th).textContent = Sound.muted ? 'Sound off' : 'Sound on';
     Object.assign(theatre, { open: true, v, idx: 1 }); th.classList.add('open'); thFocus(1); thWake();
-    Media.pauseAll($(`#w-${state.world}`)); Sound.duck(true);
+    Media.pauseAll($(`#w-${state.world}`)); Sound.duck(true); heroAudio();
   }
   function closeTheatre() {
     if (!theatre.open) return; theatre.open = false; th.classList.remove('open');
     if (theatre.v) { theatre.v.pause(); setTimeout(() => $('.th-media', th).innerHTML = '', 500); }
-    Sound.duck(false); Media.schedule($(`#w-${state.world}`), state.focusEl); hint();
+    Sound.duck(false); Media.schedule($(`#w-${state.world}`), state.focusEl); hint(); heroAudio();
   }
   function visibleBtns() { return thBtns.filter(b => !b.classList.contains('hidden')); }
   function thFocus(i) { const b = visibleBtns(); theatre.idx = Math.max(0, Math.min(b.length - 1, i)); b.forEach((x, k) => x.classList.toggle('is-focus', k === theatre.idx)); }
@@ -213,7 +224,7 @@
   }
 
   /* ---------------- actions ---------------- */
-  function toggleSound() { Sound.init(); const m = Sound.toggleMute(); document.body.classList.toggle('muted', m); toast(m ? 'Sound off' : 'Sound on'); hint(); }
+  function toggleSound() { Sound.init(); const m = Sound.toggleMute(); document.body.classList.toggle('muted', m); toast(m ? 'Sound off' : 'Sound on'); hint(); heroAudio(); }
   function openOriginal(w) {
     const st = Media.FEAT[w]; if (!st) return; toast(`Opening on ${st.cfg.platform}…`);
     const a = document.createElement('a'); a.href = st.cfg.original; a.target = '_blank'; a.rel = 'noopener'; document.body.append(a); a.click(); a.remove();
@@ -262,6 +273,7 @@
     if (fs && !document.fullscreenElement) { try { const p = fs.call(el, { navigationUI: 'hide' }); if (p && p.catch) p.catch(() => {}); } catch (e) {} }
     if (state.screen === 'intro' && !intro.boomed) { intro.boomed = true; Sound.boom(); }
     if (state.screen === 'world') Sound.world(state.world);
+    heroAudio();
   }
   Remote.on((a) => {
     firstInput();

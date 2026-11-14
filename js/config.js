@@ -24,7 +24,8 @@ window.IW = {
         original: "https://vm.tiktok.com/ZGdXxumXt/",
         platform: "TikTok",
         tiktokId: "7541735536759786774",          // used only if the local file is missing
-        aspect: 600 / 576
+        aspect: 600 / 576,
+        playWithSound: true            // loops on the main screen with its own audio
       },
       background: { slot: "background", stock: "38421529/16316166_1280_720_25fps.mp4", fallback: "city_rain.mp4" },
       screens: [
@@ -45,14 +46,14 @@ window.IW = {
         platform: "Instagram",
         aspect: 1028 / 720,
         // shown only if featured.mp4 is missing (Instagram embeds add white bars, so we never embed them)
-        standin: { label: "Night detail", stock: "29498807/12698160_1018_540_24fps.mp4", fallback: "drive_showroom.mp4" }
+        standin: { label: "356 Speedster", stock: "31220482/13335333_960_540_24fps.mp4", fallback: "drive_showroom.mp4" }
       },
       background: { slot: "background", stock: "29498824/12698131_1356_720_24fps.mp4", fallback: "drive_showroom.mp4" },
       screens: [
-        { slot: "display-1", label: "911 Cabriolet",   stock: "8630304/8630304-sd_960_540_25fps.mp4", fallback: "drive_tunnel.mp4" },
-        { slot: "display-2", label: "356 Speedster",   stock: "31220482/13335333_960_540_24fps.mp4", fallback: "drive_bokeh.mp4" },
-        { slot: "display-3", label: "Rear wing",       stock: "5309344/5309344-sd_960_540_25fps.mp4", fallback: "drive_gauge.mp4" },
-        { slot: "display-4", label: "Coast road",      stock: "8630301/8630301-sd_960_540_25fps.mp4", fallback: "drive_tunnel.mp4" }
+        { slot: "display-1", label: "Rear wing",  stock: "5309344/5309344-sd_960_540_25fps.mp4",  fallback: "drive_gauge.mp4" },
+        { slot: "display-2", label: "Cockpit",    stock: "29498821/12698094_1018_540_24fps.mp4", fallback: "drive_showroom.mp4" },
+        { slot: "display-3", label: "Night run",  stock: "29498807/12698160_1018_540_24fps.mp4", fallback: "drive_tunnel.mp4" },
+        { slot: "display-4", label: "Details",    stock: "9737953/9737953-sd_960_540_24fps.mp4",  fallback: "drive_bokeh.mp4" }
       ]
     },
 

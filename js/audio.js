@@ -53,7 +53,7 @@ window.Sound = (function () {
   /* ---------- Dark City: rain bed + thunder ---------- */
   function cityBed(on) {
     if (!ctx) return;
-    if (on && !beds.city) {
+    if (on && false) {   // no rain / hum bed — Gotham's sound is the featured clip itself
       const n = noise(), lp = ctx.createBiquadFilter(), hp = ctx.createBiquadFilter(), g = ctx.createGain();
       lp.type = 'lowpass'; lp.frequency.value = 5200; hp.type = 'highpass'; hp.frequency.value = 500;
       g.gain.value = 0.0001; g.gain.exponentialRampToValueAtTime(.16, ctx.currentTime + 2);
