@@ -1,397 +1,353 @@
-/* ISHMAIL WORLDS — main controller */
+/* ISHMAIL WORLDS — controller */
 (function () {
-  const CFG = window.WORLDS_CONFIG;
-  const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
-  const stage = $('#stage');
-  const WORLDS = ['city', 'drive', 'empire'];
-  const VEIL = { city: '#02040a', drive: '#000', empire: '#1d1008', hub: '#000' };
-  let current = 'intro', hubIndex = 0, busy = false;
-  const featured = {};   // world -> { mode, cfg }
+  const C = window.IW, $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const stage = $('#stage'), app = $('#app');
+  const ORDER = ['gotham', 'porsche', 'lifestyle'];
+  const TITLES = { gotham: 'GOTHAM', porsche: 'PORSCHE', lifestyle: 'Business <em>&amp;</em> Lifestyle' };
+  const VEIL = { gotham: 'linear-gradient(90deg,transparent,rgba(111,178,255,.5),#02040a 45%,#02040a 55%,rgba(111,178,255,.5),transparent)',
+                 porsche: 'linear-gradient(90deg,transparent,rgba(255,255,255,.55),#050505 45%,#050505 55%,rgba(213,0,28,.6),transparent)',
+                 lifestyle: 'linear-gradient(90deg,transparent,rgba(233,200,134,.55),#140c07 45%,#140c07 55%,rgba(233,200,134,.55),transparent)' };
+  const state = { screen: 'intro', world: null, focus: {}, busy: false, firstInput: false };
 
-  /* ---------------- stage scaling (always 16:9, letterboxed) ---------------- */
+  /* ---------------- fit the 1920×1080 stage to any screen ---------------- */
   function fit() { const s = Math.min(innerWidth / 1920, innerHeight / 1080); stage.style.transform = `scale(${s})`; }
   addEventListener('resize', fit); fit();
 
-  /* ---------------- clocks ---------------- */
+  /* ---------------- TV hardware: lighter mode ---------------- */
+  const q = new URLSearchParams(location.search);
+  const tvLike = /Android|SMART-TV|SmartTV|GoogleTV|AFT|BRAVIA|CrKey|Tizen|Web0S|NetCast|Nebula/i.test(navigator.userAgent) && !/Mobile/i.test(navigator.userAgent);
+  const lite = q.has('lite') || (!q.has('full') && (tvLike || (navigator.hardwareConcurrency || 8) <= 4 || (navigator.deviceMemory || 8) <= 2));
+  if (lite) document.body.classList.add('lite');
+  Media.setBudget(lite ? 4 : 9);
+  if (Sound.muted) document.body.classList.add('muted');
+
+  /* ---------------- clocks (real time, real places) ---------------- */
   const pad = n => String(n).padStart(2, '0');
-  function clocks() {
-    const d = new Date(), h = d.getHours(), m = d.getMinutes(), s = d.getSeconds();
-    const map = {
-      hm: `${pad(h)}:${pad(m)}`, hms: `${pad(h)}:${pad(m)}:${pad(s)}`, s: pad(s),
-      hm12: `${(h % 12) || 12}:${pad(m)} ${h < 12 ? 'am' : 'pm'}`,
-      date: d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' }),
-      dateLong: d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }),
-      dateUpper: d.toLocaleDateString('en-GB', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase(),
-      dayUpper: d.toLocaleDateString('en-GB', { weekday: 'long' }).toUpperCase()
-    };
-    $$('[data-clock]').forEach(el => { const v = map[el.dataset.clock]; if (el.textContent !== v) el.textContent = v; });
-    const stamp = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${map.hms}`;
-    $$('.c-time').forEach(el => el.textContent = stamp);
-    $('.hub-greet-small').textContent = h < 5 ? 'Late night' : h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
-  }
-  clocks(); setInterval(clocks, 1000);
-  $('.hub-greet-name').textContent = CFG.name;
-
-  /* ---------------- toast ---------------- */
-  let toastT; function toast(msg, ms = 2600) { const t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), ms); }
-
-  /* ---------------- media panels ---------------- */
-  const isImg = s => /\.(jpe?g|png|webp|gif|avif)$/i.test(s);
-  function makePanel(p, cls, world) {
-    const el = document.createElement('div');
-    el.className = `panel ${cls}`; el.tabIndex = 0; el.dataset.id = p.id; el.dataset.world = world; el.dataset.title = p.title;
-    const hint = document.createElement('div'); hint.className = 'p-hint';
-    let media;
-    const useSrc = (src, isFallback) => {
-      if (media) media.remove();
-      if (isImg(src)) { media = new Image(); media.className = 'media'; media.src = src; }
-      else {
-        media = document.createElement('video'); Object.assign(media, { muted: true, loop: true, playsInline: true, preload: 'auto', autoplay: false });
-        media.setAttribute('muted', ''); media.src = src;
-        if (current === world) media.play().catch(() => {});
-      }
-      media.addEventListener('error', () => {
-        if (!isFallback && p.fallback) { el.classList.add('placeholder'); hint.textContent = `Add your clip → ${p.src}`; useSrc(p.fallback, true); }
-        else { el.classList.add('placeholder'); hint.textContent = `Missing file: ${src}`; }
-      }, { once: true });
-      el.prepend(media); el.dataset.src = src;
-    };
-    el.append(hint); useSrc(p.src, false);
-    return el;
+  function tickClocks() {
+    const d = new Date();
+    $$('[data-clock="hm"]').forEach(e => e.textContent = `${pad(d.getHours())}:${pad(d.getMinutes())}`);
+    $$('[data-clock="date"]').forEach(e => e.textContent = d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' }));
+    $$('.l-row').forEach(r => { try { r.querySelector('.t').textContent = d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: r.dataset.tz }); } catch (e) {} });
   }
 
-  /* ---------------- featured reel: local file → embed → clear fallback ---------------- */
-  function embedUrl(f) {
-    if (f.platform === 'tiktok') {
-      const id = (f.tiktokId || '').trim() || ((f.url.match(/\/video\/(\d+)/) || [])[1]);
-      return id ? `https://www.tiktok.com/player/v1/${id}?autoplay=1&loop=1&music_info=0&description=0&rel=0&controls=1` : null;
-    }
-    if (f.platform === 'instagram') { const code = (f.url.match(/\/(?:reel|p)\/([^/?#]+)/) || [])[1]; return code ? `https://www.instagram.com/reel/${code}/embed/` : null; }
-    return null;
-  }
-  const PLAT = { tiktok: 'TikTok', instagram: 'Instagram' };
-  let IN_PREVIEW = false; try { IN_PREVIEW = window.self !== window.top; } catch (e) { IN_PREVIEW = true; }
-  /* Builds the embed for a given box size. Instagram's embed page = 54px header + a 4:5 media box
-     (video letterboxed inside) + footer, so with crop on we shift the iframe up to show only the video. */
-  function makeEmbed(f, url, SW, SH) {
-    const wrap = document.createElement('div'); wrap.className = 'embed-wrap';
-    wrap.style.cssText = 'position:absolute;inset:0;overflow:hidden;background:#000';
-    const ifr = document.createElement('iframe');
-    ifr.src = url; ifr.allow = 'autoplay; encrypted-media; fullscreen; picture-in-picture'; ifr.setAttribute('allowfullscreen', '');
-    ifr.referrerPolicy = 'strict-origin-when-cross-origin'; ifr.setAttribute('scrolling', 'no');
-    if (f.platform === 'instagram' && f.crop !== false && f.aspect) {
-      // fit the video's own shape inside the box, then line the iframe up so only the video shows
-      let vw = SW, vh = SW / f.aspect; if (vh > SH) { vh = SH; vw = SH * f.aspect; }
-      const W = Math.round(vw), top = 54 + (1.25 * W - W / f.aspect) / 2;
-      ifr.style.cssText = `position:absolute;border:0;width:${W}px;height:${Math.round(54 + 1.25 * W + 360)}px;left:${Math.round((SW - W) / 2)}px;top:${Math.round((SH - vh) / 2 - top)}px`;
-    } else ifr.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;border:0';
-    wrap.append(ifr); return { wrap, ifr };
-  }
-  function buildFeatured(world) {
-    const f = CFG[world].featured, host = $(`[data-featured="${world}"]`);
-    host.classList.add('featured-host'); host.tabIndex = 0; host.dataset.world = world;
-    const sideTitle = { city: 'Case File 001', drive: 'Reel 01', empire: '' }[world];
-    host.innerHTML = `
-      <div class="feat">
-        <div class="feat-label">${f.label}</div>
-        <div class="feat-screen"></div>
-        <div class="feat-side">
-          <div class="side-title">${sideTitle}</div>
-          <div class="side-meta">Source <b>${PLAT[f.platform]}</b><br>Press <b>O</b> to open<br>Press <b>Enter</b> to enlarge</div>
-          <img class="qr" src="${f.qr}" alt="QR code">
-          <a class="feat-open" href="${f.url}" target="_blank" rel="noopener">&#8599; Open original</a>
-          <div class="status">Loading…</div>
-        </div>
-      </div>`;
-    const screen = $('.feat-screen', host), status = $('.status', host);
-    const state = featured[world] = { mode: 'loading', cfg: f };
-    const setStatus = s => status.textContent = s;
+  /* ---------------- build media ---------------- */
+  $$('[data-slot]').forEach(el => {
+    const spec = Media.bindSlot(el);
+    const lab = el.querySelector('.mon-label, .p-cap, .l-cap'); if (lab && spec) lab.textContent = spec.label;
+  });
+  ORDER.forEach(w => Media.featured(w, $(`[data-featured="${w}"]`)));
 
-    function fallback(reason) {
-      state.mode = 'fallback'; host.classList.add('is-fallback');
-      const txt = {
-        'needs-id': [`Open on ${PLAT[f.platform]}`, `TikTok won't embed a short link. Paste the clip's number into js/config.js (see README), or scan the code to watch on your phone.`],
-        offline: ['You’re offline', `Save a copy as ${f.localFile} to play it here without internet, or scan to watch on your phone.`],
-        blocked: [`${PLAT[f.platform]} blocked playback`, `The platform didn't load inside this page. Press O to open the original, or scan the code.`],
-        none: ['Featured clip', 'Press O to open the original.'],
-        preview: [`Watch on ${PLAT[f.platform]}`, `This online preview can't play ${PLAT[f.platform]} inside the page. It plays when you run the downloaded version in Chrome. Tap below or scan the code.`]
-      }[reason];
-      screen.innerHTML = `<div class="feat-fallback"><h3>${txt[0]}</h3><img src="${f.qr}" alt="QR code"><p>${txt[1]}</p>
-        <a class="feat-open" href="${f.url}" target="_blank" rel="noopener">&#8599; Open original <kbd>O</kbd></a></div>`;
-      setStatus(reason === 'preview' ? 'Preview mode — embeds play in the downloaded version' : reason === 'needs-id' ? 'Embed needs the video number' : reason === 'offline' ? 'Offline — not embedded' : 'Embed unavailable');
-    }
-    function tryEmbed() {
-      const url = embedUrl(f);
-      if (!url) return fallback(f.platform === 'tiktok' ? 'needs-id' : 'none');
-      if (!navigator.onLine) return fallback('offline');
-      if (IN_PREVIEW) return fallback('preview');
-      const { wrap, ifr } = makeEmbed(f, url, screen.clientWidth || parseInt(getComputedStyle(screen).width), screen.clientHeight || parseInt(getComputedStyle(screen).height));
-      let loaded = false;
-      ifr.addEventListener('load', () => { loaded = true; state.mode = 'embed'; setStatus(f.platform === 'instagram' ? 'Click the video to play. Blank or blocked? Press O.' : 'Embedded from TikTok. Blank or blocked? Press O.'); });
-      setTimeout(() => { if (!loaded) { ifr.remove(); fallback('blocked'); } }, 15000);
-      screen.innerHTML = ''; screen.append(wrap); state.mode = 'embed-loading'; state.embed = url; state.rebuild = tryEmbed; setStatus(`Connecting to ${PLAT[f.platform]}…`);
-    }
-    // 1) a local copy always wins (works offline)
-    if (f.localFile) {
-      const v = document.createElement('video'); Object.assign(v, { muted: true, loop: true, playsInline: true, preload: 'auto' });
-      v.addEventListener('loadeddata', () => { state.mode = 'local'; state.local = f.localFile; screen.innerHTML = ''; screen.append(v);
-        if (current === world) v.play().catch(() => {}); setStatus('Playing from this computer (offline-ready). M = sound.'); }, { once: true });
-      v.addEventListener('error', tryEmbed, { once: true });
-      v.src = f.localFile;
-    } else tryEmbed();
+  // destinations: list rows + crossfading window
+  const L = C.worlds.lifestyle, list = $('.l-list');
+  L.destinations.forEach((d, i) => {
+    const li = document.createElement('li');
+    li.innerHTML = `<button class="l-row" data-focus="dest" data-i="${i}" data-tz="${d.tz}"><span class="n">${d.name}</span><span class="t"></span></button>`;
+    list.append(li);
+  });
+  let destI = -1, destT;
+  function setDest(i) {
+    if (i === destI) return; destI = i; const d = L.destinations[i], win = $('.l-window');
+    const target = win.classList.contains('flip') ? $('video.a', win) : $('video.b', win);
+    Media.load(target, Media.chain('lifestyle', d));
+    target.dataset.label = d.name;
+    target.oncanplay = () => { target.oncanplay = null; target.play().catch(() => {}); win.classList.toggle('flip'); $('.l-window-name').textContent = d.name;
+      setTimeout(() => { const other = win.classList.contains('flip') ? $('video.a', win) : $('video.b', win); other.pause(); }, 1500); };
+    $$('.l-row').forEach(r => r.classList.toggle('active', +r.dataset.i === i));
   }
+  function cycleDest() { clearTimeout(destT); destT = setTimeout(() => { if (state.world === 'lifestyle' && !(focused() && focused().classList.contains('l-row'))) setDest((destI + 1) % L.destinations.length); cycleDest(); }, 14000); }
+  setDest(0); cycleDest();
+  tickClocks(); setInterval(tickClocks, 1000);
 
-  /* ---------------- build each world ---------------- */
-  function buildCity() {
-    const c = CFG.city, w = $('#world-city'); $('.w-bg', w).src = c.background;
-    const deco = el => { el.insertAdjacentHTML('beforeend', `<i class="hud-c tl"></i><i class="hud-c tr"></i><i class="hud-c bl"></i><i class="hud-c br"></i>
-      <span class="c-label">${el.dataset.title}</span><span class="c-time"></span>`); return el; };
-    const P = Object.fromEntries(c.panels.map(p => [p.id, p]));
-    const left = $('[data-slot="left"]', w), right = $('[data-slot="right"]', w);
-    left.append(deco(makePanel(P.radar, 'cpanel h-l', 'city')), deco(makePanel(P.cam2, 'cpanel h-m', 'city')), deco(makePanel(P.edit1, 'cpanel h-m', 'city')));
-    right.append(deco(makePanel(P.edit2, 'cpanel h-m', 'city')), deco(makePanel(P.edit3, 'cpanel h-m', 'city')));
-    right.prepend(deco(makePanel(P.cam1, 'cpanel h-m', 'city')));
-    // move quote between cam and edits
-    right.insertBefore($('.city-quote', w), right.children[1]);
-    $('.city-quote', w).classList.add('h-l');
-    buildFeatured('city');
-    const bits = ['NIGHT WATCH ACTIVE', 'ALL SECTORS QUIET', 'PRESS L FOR LIGHTNING', 'PRESS O TO OPEN THE FEATURED CLIP', ...c.quotes.map(q => q.text.toUpperCase()), 'PRESS ESC TO RETURN'];
-    $('.ticker-track', w).innerHTML = bits.map(b => `<span>${b}</span>`).join('<b>◆</b>') + '<b>◆</b>';
-    FX.rain($('.city-rain', w), 'cityRain', { count: 520, wind: 2.6, floor: 60 });
-  }
-  function buildDrive() {
-    const c = CFG.drive, w = $('#world-drive'); $('.w-bg', w).src = c.background; $('.drive-tag', w).textContent = c.tagline;
-    const bays = $('[data-slot="bays"]', w);
-    c.panels.forEach((p, i) => {
-      const bay = document.createElement('div'); bay.className = 'dbay';
-      bay.append(makePanel(p, 'dpanel', 'drive'));
-      bay.insertAdjacentHTML('beforeend', `<div class="dbay-cap"><span><span class="n">0${i + 1}</span><span class="t">${p.title}</span></span><span class="s">${p.spec || ''}</span></div>`);
-      bays.append(bay);
-    });
-    buildFeatured('drive');
-    $('.drive-feature .side-meta', w).innerHTML = `Source <b>Instagram</b><br>Showroom <b>01</b><br>Press <b>O</b> to open`;
-    const leds = $('.rev-leds', w); for (let i = 0; i < 40; i++) { const e = document.createElement('i'); e.className = i < 24 ? 'g' : i < 34 ? 'a' : 'r'; leds.append(e); }
-  }
-  function buildEmpire() {
-    const c = CFG.empire, w = $('#world-empire'); $('.w-bg', w).src = c.background;
-    const P = Object.fromEntries(c.panels.map(p => [p.id, p]));
-    const cap = (el, small) => { el.insertAdjacentHTML('beforeend', `<div class="e-cap"><small>${small}</small>${el.dataset.title}</div>`); return el; };
-    $('[data-slot="coast"]', w).append(cap(makePanel(P.coast, 'epanel', 'empire'), 'Travel'));
-    $('[data-slot="right"]', w).append(cap(makePanel(P.form, 'epanel', 'empire'), 'Architecture'), cap(makePanel(P.life1, 'epanel', 'empire'), 'Lifestyle'));
-    $('[data-slot="watch"]', w).append(cap(makePanel(P.time, 'epanel', 'empire'), 'Horology'));
-    buildFeatured('empire');
-    FX.dust($('.empire-dust', w));
-  }
+  // quotes over the city strip
+  let qi = 0; const quoteEl = $('.l-quote'); quoteEl.textContent = L.quotes[0];
+  setInterval(() => { if (state.world !== 'lifestyle') return; quoteEl.classList.add('out');
+    setTimeout(() => { qi = (qi + 1) % L.quotes.length; quoteEl.textContent = L.quotes[qi]; quoteEl.classList.remove('out'); Sound.chime(); }, 1300); }, 13000);
 
-  /* ---------------- quotes ---------------- */
-  const qi = { city: 0, empire: 0 }; let qTimer = {};
-  function cityQuote(next) {
-    const qs = CFG.city.quotes, box = $('.city-quote'); if (next) qi.city = (qi.city + 1) % qs.length;
-    const q = qs[qi.city], el = $('.cq-text', box);
-    $('.cq-count', box).textContent = `${pad(qi.city + 1)} / ${pad(qs.length)}`; $('.cq-by', box).textContent = `— ${q.by}`;
-    el.innerHTML = '<span class="cq-inner">' + q.text.split('').map(ch => `<span class="ch">${ch}</span>`).join('') + '<span class="cursor"></span></span>';
-    const chars = $$('.ch', el); let i = 0; box.classList.add('speaking'); clearInterval(qTimer.cityType);
-    qTimer.cityType = setInterval(() => { if (i >= chars.length) { clearInterval(qTimer.cityType); box.classList.remove('speaking'); return; }
-      chars[i].classList.add('on'); if (chars[i].textContent.trim() && i % 2 === 0) Sound.typeBlip(); i++; }, 42);
-    clearTimeout(qTimer.city); qTimer.city = setTimeout(() => current === 'city' && cityQuote(true), 9500);
-  }
-  function empireQuote(next) {
-    const qs = CFG.empire.quotes, box = $('.empire-quote'); if (next) qi.empire = (qi.empire + 1) % qs.length;
-    const q = qs[qi.empire], el = $('.eq-text', box);
-    box.classList.remove('on'); $$('.w', el).forEach(w => w.classList.remove('on'));
-    setTimeout(() => {
-      el.innerHTML = q.text.split(' ').map(w => `<span class="w">${w}</span>`).join(' ');
-      $('.eq-by span', box).textContent = q.by;
-      $$('.w', el).forEach((w, i) => setTimeout(() => w.classList.add('on'), 120 + i * 170));
-      box.classList.add('on'); Sound.chime();
-    }, next ? 900 : 50);
-    clearTimeout(qTimer.empire); qTimer.empire = setTimeout(() => current === 'empire' && empireQuote(true), 11000);
-  }
+  // effects
+  FX.dust($('#dust'), 'introDust', { count: 170 });
+  FX.rain($('.g-rain'), 'rain');
+  FX.dust($('.l-dust'), 'gold', { count: 70, lite: 25, color: '255,214,150' });
+  FX.map($('.g-map'));
+  FX.bats($('.g-bats'));
 
-  /* ---------------- world-specific actions ---------------- */
-  let lightningT;
-  function lightning() {
-    const f = $('.city-flash');
-    f.animate([{ opacity: 0 }, { opacity: .95, offset: .05 }, { opacity: .1, offset: .15 }, { opacity: .75, offset: .25 }, { opacity: 0 }], { duration: 900, easing: 'ease-out' });
-    $('#world-city .w-bg').animate([{ filter: 'brightness(1.6) saturate(.5) contrast(1.2)' }, { filter: 'brightness(.55) saturate(.7) contrast(1.15)' }], { duration: 900 });
-    setTimeout(Sound.thunder, 350 + Math.random() * 500);
+  /* ---------------- Porsche: the hero film's progress, as a racing line ---------------- */
+  const trackPath = $('.p-track-done'), car = $('.p-car'), plen = trackPath.getTotalLength();
+  trackPath.style.strokeDasharray = plen; trackPath.style.strokeDashoffset = plen;
+  const fmt = s => isFinite(s) ? `${Math.floor(s / 60)}:${pad(Math.floor(s % 60))}` : '0:00';
+  function trackTick() {
+    const st = Media.FEAT.porsche;
+    if (st && st.mode === 'local') {
+      const v = st.video, p = v.duration ? v.currentTime / v.duration : 0;
+      trackPath.style.strokeDashoffset = plen * (1 - p); const pt = trackPath.getPointAtLength(plen * p); car.setAttribute('cx', pt.x); car.setAttribute('cy', pt.y);
+      $('.p-time').textContent = `${fmt(v.currentTime)} / ${fmt(v.duration)}`; $('.p-track').classList.remove('hidden');
+    } else $('.p-track').classList.add('hidden');
   }
-  function scheduleLightning() { clearTimeout(lightningT); lightningT = setTimeout(() => { if (current === 'city') { lightning(); } scheduleLightning(); }, 11000 + Math.random() * 14000); }
+  setInterval(trackTick, 250);
 
-  let rpm = 950, revAnim = null;
-  function setLeds(r) {
-    const n = Math.round(r / 8000 * 40); $$('#world-drive .rev-leds i').forEach((e, i) => e.classList.toggle('on', i < n));
-    $('.rev-num').textContent = String(Math.round(r / 10) * 10).padStart(4, '0');
+  /* ---------------- focus model ----------------
+     LEFT / RIGHT  → switch worlds
+     UP / DOWN     → move through this world's items, in a fixed order
+     OK            → act on the focused item                               */
+  const FOCUS_ORDER = {
+    gotham: ['.g-hero', '#w-gotham .open-original', '[data-slot="gotham/feed-1"]', '[data-slot="gotham/feed-2"]', '[data-slot="gotham/feed-3"]', '[data-slot="gotham/feed-4"]'],
+    porsche: ['.p-hero', '#w-porsche .open-original', '[data-slot="porsche/display-1"]', '[data-slot="porsche/display-2"]', '[data-slot="porsche/display-3"]', '[data-slot="porsche/display-4"]'],
+    lifestyle: ['.l-hero', '#w-lifestyle .open-original', '.l-strip', '[data-slot="lifestyle/collection-1"]', '[data-slot="lifestyle/collection-2"]', '[data-slot="lifestyle/collection-3"]', '[data-slot="lifestyle/collection-4"]', '.l-row']
+  };
+  function items(w = state.world) {
+    const out = [$('.tb-sound')];
+    FOCUS_ORDER[w].forEach(sel => $$(sel).forEach(el => { if (el.classList.contains('open-original') && !el.classList.contains('show')) return; out.push(el); }));
+    return out;
   }
-  function revTo(peak, upMs, downMs) {
-    const t0 = performance.now(), from = rpm; cancelAnimationFrame(revAnim); $('#world-drive').classList.add('shake');
-    const step = now => {
-      const t = now - t0;
-      if (t < upMs) rpm = from + (peak - from) * (1 - Math.pow(1 - t / upMs, 2.2));
-      else if (t < upMs + downMs) { rpm = peak - (peak - 950) * Math.pow((t - upMs) / downMs, .7); $('#world-drive').classList.remove('shake'); }
-      else { rpm = 950; setLeds(rpm); return; }
-      setLeds(rpm); revAnim = requestAnimationFrame(step);
-    }; revAnim = requestAnimationFrame(step);
-  }
-  setInterval(() => { if (current === 'drive' && rpm <= 1000) { setLeds(930 + Math.random() * 60); } }, 120);
-  function rev() { Sound.rev(); revTo(7900, 1150, 1500); }
-
-  /* ---------------- screens & transitions ---------------- */
-  function playIn(el, on) { $$('video', el).forEach(v => { if (on) { v.play().catch(() => {}); } else v.pause(); }); }
-  function show(id) { $$('.screen').forEach(s => s.classList.toggle('active', s.id === id)); }
-
-  function veil(color, origin, cb) {
-    const v = $('#veil'); v.style.background = color; v.style.transition = 'none';
-    v.style.clipPath = `circle(0px at ${origin[0]}px ${origin[1]}px)`; v.style.opacity = 1;
-    requestAnimationFrame(() => requestAnimationFrame(() => {
-      v.style.transition = 'clip-path .85s cubic-bezier(.7,0,.25,1)'; v.style.clipPath = `circle(2300px at ${origin[0]}px ${origin[1]}px)`;
-      setTimeout(() => { cb(); v.style.transition = 'opacity .9s ease'; v.style.opacity = 0; }, 880);
-    }));
-  }
-  function stagePoint(el) {
-    if (!el) return [960, 540]; const r = el.getBoundingClientRect(), s = stage.getBoundingClientRect(), k = 1920 / s.width;
-    return [(r.left + r.width / 2 - s.left) * k, (r.top + r.height / 2 - s.top) * k];
-  }
-
-  function goHub(fromIntro) {
-    if (busy) return; busy = true; const prev = current;
-    const done = () => {
-      show('hub'); current = 'hub'; Sound.world(null); stopWorldFx(prev);
-      const hub = $('#hub'); hub.classList.add('entering'); playIn(hub, true);
-      $$('.portal').forEach((p, i) => p.style.transitionDelay = `${.15 + i * .14}s`);
-      requestAnimationFrame(() => requestAnimationFrame(() => hub.classList.remove('entering')));
-      setTimeout(() => { $$('.portal').forEach(p => p.style.transitionDelay = ''); busy = false; }, 1300);
-      focusPortal(hubIndex); FX.start('portalRain');
-      if (prev !== 'intro') WORLDS.forEach(w => playIn($(`#world-${w}`), false));
-    };
-    if (fromIntro) { $('#intro').classList.add('leaving'); Sound.whoosh(1.4); setTimeout(() => { FX.stop('intro'); done(); }, 900); }
-    else veil(VEIL.hub, [960, 540], done);
-  }
-
-  function enterWorld(name, originEl) {
-    if (busy || current === name) return; busy = true; const prev = current; Sound.init(); Sound.whoosh(1.1);
-    veil(VEIL[name], stagePoint(originEl), () => {
-      $$('.screen').forEach(s => s.classList.remove('arrive'));
-      show(`world-${name}`); current = name; const w = $(`#world-${name}`); w.classList.add('arrive');
-      playIn(w, true); playIn($('#hub'), false); FX.stop('portalRain'); stopWorldFx(prev);
-      WORLDS.filter(x => x !== name).forEach(x => playIn($(`#world-${x}`), false));
-      Sound.world(name);
-      if (name === 'city') { FX.start('cityRain'); cityQuote(false); setTimeout(lightning, 1200); scheduleLightning(); }
-      if (name === 'drive') { rpm = 950; revTo(8000, 600, 900); }
-      if (name === 'empire') { FX.start('dust'); empireQuote(false); }
-      focusables()[0] && setFocus(focusables()[0], true);
-      setTimeout(() => { busy = false; }, 900);
-    });
-  }
-  function stopWorldFx(w) { if (w === 'city') { FX.stop('cityRain'); clearTimeout(lightningT); } if (w === 'empire') FX.stop('dust'); }
-
-  /* ---------------- focus & spatial navigation ---------------- */
-  function focusPortal(i) { hubIndex = (i + 3) % 3; $$('.portal').forEach((p, k) => p.classList.toggle('focus', k === hubIndex)); }
-  function focusables() { return current in CFG ? $$(`#world-${current} .featured-host, #world-${current} .panel`) : []; }
-  let focused = null;
+  const focused = () => state.focusEl;
   function setFocus(el, silent) {
-    $$('.focus').forEach(e => { if (!e.classList.contains('portal')) e.classList.remove('focus'); });
-    focused = el; if (!el) return; el.classList.add('focus'); if (el.parentElement.classList.contains('dbay')) el.parentElement.classList.add('focus');
+    if (state.focusEl === el) return;
+    if (state.focusEl) state.focusEl.classList.remove('is-focus');
+    state.focusEl = el; if (!el) return;
+    el.classList.add('is-focus'); try { el.focus({ preventScroll: true }); } catch (e) {}
+    state.focus[state.world] = el;
     if (!silent) Sound.tick();
+    if (el.classList.contains('l-row')) setDest(+el.dataset.i);
+    hint(); Media.schedule($(`#w-${state.world}`), el);
   }
-  function moveFocus(dx, dy) {
-    const list = focusables(); if (!list.length) return; if (!focused || !list.includes(focused)) return setFocus(list[0]);
-    const a = focused.getBoundingClientRect(), ax = a.left + a.width / 2, ay = a.top + a.height / 2; let best = null, bs = 1e9;
-    for (const el of list) { if (el === focused) continue; const b = el.getBoundingClientRect(), bx = b.left + b.width / 2, by = b.top + b.height / 2;
-      const ddx = bx - ax, ddy = by - ay; if ((dx && Math.sign(ddx) !== dx) || (dy && Math.sign(ddy) !== dy)) continue;
-      const along = dx ? Math.abs(ddx) : Math.abs(ddy), across = dx ? Math.abs(ddy) : Math.abs(ddx), score = along + across * 2.2;
-      if (score < bs) { bs = score; best = el; } }
-    if (best) setFocus(best);
+  function move(d) {
+    const list = items(); let i = list.indexOf(state.focusEl);
+    if (i < 0) { setFocus(list[1] || list[0]); return; }
+    const n = Math.max(0, Math.min(list.length - 1, i + d));
+    if (n !== i) setFocus(list[n]); else bump();
+  }
+  function bump() { const el = state.focusEl; if (!el) return; el.animate([{ translate: '0 0' }, { translate: '0 -6px' }, { translate: '0 0' }], { duration: 220 }); }
+  document.addEventListener('focusin', e => { // keep in sync if the browser moves focus itself
+    const t = e.target.closest('[data-focus]'); if (t && state.screen === 'world' && t !== state.focusEl && items().includes(t)) setFocus(t, true);
+  });
+
+  /* ---------------- hint (what OK will do) ---------------- */
+  let hintT;
+  function okLabel(el) {
+    if (!el) return '';
+    if (el.classList.contains('tb-sound')) return Sound.muted ? 'Sound on' : 'Sound off';
+    if (el.classList.contains('open-original')) return el.textContent;
+    if (el.classList.contains('featured')) { const st = Media.FEAT[state.world];
+      if (st.mode === 'local') return 'Watch with sound'; if (st.cfg.platform === 'TikTok' && st.mode === 'embed') return 'Play / pause'; return `Open on ${st.cfg.platform}`; }
+    if (el.classList.contains('l-row')) return el.classList.contains('active') ? 'Full screen' : 'Show';
+    return 'Full screen';
+  }
+  function hint() {
+    const h = $('#hint');
+    h.innerHTML = `<span><b>◀ ▶</b>Worlds</span><span><b>▲ ▼</b>Select</span><span><b>OK</b>${okLabel(state.focusEl)}</span>`;
+    h.classList.remove('idle'); clearTimeout(hintT); hintT = setTimeout(() => h.classList.add('idle'), 5000);
+    app.classList.add('show-edges'); clearTimeout(hint.e); hint.e = setTimeout(() => app.classList.remove('show-edges'), 3500);
   }
 
-  /* ---------------- lightbox ---------------- */
-  function openLightbox(el) {
-    const lb = $('#lightbox'), m = $('.lb-media', lb); m.innerHTML = ''; m.classList.remove('portrait'); m.style.width = m.style.height = '';
-    if (el.classList.contains('featured-host')) {
-      const st = featured[el.dataset.world]; $('.lb-title', lb).textContent = st.cfg.label;
-      if (st.mode === 'local') { const v = document.createElement('video'); Object.assign(v, { src: st.local, loop: true, autoplay: true, controls: true, muted: Sound.muted }); m.append(v); }
-      else if (st.embed) {
-        const a = st.cfg.aspect || 16 / 9, H = 860, Wd = Math.min(1600, Math.round(H * a));
-        m.style.width = Wd + 'px'; m.style.height = (Wd / a > H ? H : Math.round(Wd / a)) + 'px';
-        m.append(makeEmbed(st.cfg, st.embed, Wd, parseInt(m.style.height)).wrap);
-      }
-      else { openOriginal(); return; }
-    } else {
-      $('.lb-title', lb).textContent = el.dataset.title; const src = el.dataset.src;
-      if (isImg(src)) { const i = new Image(); i.src = src; i.style.cssText = 'width:100%;height:100%;object-fit:contain'; m.append(i); }
-      else { const v = document.createElement('video'); Object.assign(v, { src, loop: true, autoplay: true, muted: Sound.muted, playsInline: true }); m.append(v); }
-    }
-    lb.classList.add('open'); Sound.whoosh(.7);
+  /* ---------------- world switching ---------------- */
+  function setChrome(w) {
+    app.dataset.world = w; $('.tb-title').innerHTML = TITLES[w];
+    $$('.tb-dots button').forEach(b => b.classList.toggle('on', b.dataset.go === w));
+    const i = ORDER.indexOf(w);
+    $('.edge.prev span').innerHTML = TITLES[ORDER[(i + 2) % 3]].replace(/<[^>]+>/g, '');
+    $('.edge.next span').innerHTML = TITLES[ORDER[(i + 1) % 3]].replace(/<[^>]+>/g, '');
   }
-  function closeOverlays() { const o = $$('.overlay.open'); o.forEach(x => x.classList.remove('open')); setTimeout(() => $('.lb-media').innerHTML = '', 450); return o.length > 0; }
-  function openOriginal() { const st = featured[current]; if (!st) return; const a = $(`#world-${current} .feat-open`); if (a) a.click(); else window.open(st.cfg.url, '_blank', 'noopener'); toast(`Opening the original on ${PLAT[st.cfg.platform]}…`); }
+  function enterWorld(w, dir) {
+    const prev = state.world; if (prev === w) return;
+    const inEl = $(`#w-${w}`), outEl = prev && $(`#w-${prev}`);
+    setChrome(w); state.world = w;
+    if (outEl) {
+      outEl.classList.remove('current'); outEl.classList.add(dir > 0 ? 'to-left' : 'to-right');
+      setTimeout(() => { outEl.classList.remove('to-left', 'to-right'); if (state.world !== prev) Media.pauseAll(outEl); }, 1200);
+      const v = $('#veil'); v.style.background = VEIL[w];
+      v.animate([{ opacity: 0, transform: `translateX(${dir > 0 ? 60 : -60}%)` }, { opacity: 1, transform: 'translateX(0)', offset: .5 }, { opacity: 0, transform: `translateX(${dir > 0 ? -60 : 60}%)` }],
+        { duration: 1100, easing: 'cubic-bezier(.6,0,.3,1)' });
+    }
+    inEl.classList.remove('current', 'to-left', 'to-right'); inEl.classList.add(dir > 0 ? 'from-right' : dir < 0 ? 'from-left' : 'x');
+    void inEl.offsetWidth; inEl.classList.remove('from-right', 'from-left', 'x'); inEl.classList.add('current');
+    Sound.world(w); if (prev) Sound.whoosh(1);
+    if (state.focusEl) state.focusEl.classList.remove('is-focus'); state.focusEl = null;
+    setFocus(state.focus[w] && items(w).includes(state.focus[w]) ? state.focus[w] : items(w)[1], true);
+    Media.schedule(inEl, state.focusEl);
+    if (w === 'gotham') { FX.start('rain'); scheduleLightning(); } else FX.stop('rain');
+    if (w === 'lifestyle') FX.start('gold'); else FX.stop('gold');
+  }
+  function step(dir) { if (state.busy) return; const i = ORDER.indexOf(state.world); enterWorld(ORDER[(i + dir + 3) % 3], dir); state.busy = true; setTimeout(() => state.busy = false, 650); }
+
+  /* Gotham weather */
+  let lt;
+  function lightning() {
+    $('.g-flash').animate([{ opacity: 0 }, { opacity: .9, offset: .06 }, { opacity: .1, offset: .16 }, { opacity: .65, offset: .26 }, { opacity: 0 }], { duration: 1000, easing: 'ease-out' });
+    setTimeout(() => Sound.thunder(), 400 + Math.random() * 600);
+  }
+  function scheduleLightning() { clearTimeout(lt); lt = setTimeout(() => { if (state.world === 'gotham' && state.screen === 'world' && !theatre.open) lightning(); scheduleLightning(); }, 9000 + Math.random() * 15000); }
+
+  /* ---------------- full-screen player ---------------- */
+  const th = $('#theatre'), thBtns = $$('.th-btn', th);
+  const theatre = { open: false, v: null, idx: 1, t: 0, featuredWorld: null };
+  function openTheatre(src, title, featuredWorld, startAt) {
+    if (!src) return;
+    const v = document.createElement('video'); Object.assign(v, { src, loop: true, playsInline: true, autoplay: true }); v.muted = Sound.muted;
+    $('.th-media', th).innerHTML = ''; $('.th-media', th).append(v);
+    v.addEventListener('loadedmetadata', () => { if (startAt) v.currentTime = startAt; }, { once: true });
+    v.play().catch(() => { v.muted = true; v.play().catch(() => {}); });
+    v.ontimeupdate = () => { $('.th-progress i', th).style.width = `${(v.currentTime / v.duration) * 100 || 0}%`; $('.th-time', th).textContent = `${fmt(v.currentTime)} / ${fmt(v.duration)}`; };
+    v.onplay = v.onpause = () => $('.th-play', th).textContent = v.paused ? 'Play' : 'Pause';
+    $('.th-title', th).textContent = title || '';
+    theatre.featuredWorld = featuredWorld; $('[data-act="original"]', th).classList.toggle('hidden', !featuredWorld);
+    $('[data-act="sound"]', th).textContent = Sound.muted ? 'Sound off' : 'Sound on';
+    Object.assign(theatre, { open: true, v, idx: 1 }); th.classList.add('open'); thFocus(1); thWake();
+    Media.pauseAll($(`#w-${state.world}`)); Sound.duck(true);
+  }
+  function closeTheatre() {
+    if (!theatre.open) return; theatre.open = false; th.classList.remove('open');
+    if (theatre.v) { theatre.v.pause(); setTimeout(() => $('.th-media', th).innerHTML = '', 500); }
+    Sound.duck(false); Media.schedule($(`#w-${state.world}`), state.focusEl); hint();
+  }
+  function visibleBtns() { return thBtns.filter(b => !b.classList.contains('hidden')); }
+  function thFocus(i) { const b = visibleBtns(); theatre.idx = Math.max(0, Math.min(b.length - 1, i)); b.forEach((x, k) => x.classList.toggle('is-focus', k === theatre.idx)); }
+  function thWake() { th.classList.remove('idle'); clearTimeout(theatre.t); theatre.t = setTimeout(() => th.classList.add('idle'), 4000); }
+  function thAct(act) {
+    const v = theatre.v; if (!v) return;
+    if (act === 'play') v.paused ? v.play().catch(() => {}) : v.pause();
+    if (act === 'back10') v.currentTime = Math.max(0, v.currentTime - 10);
+    if (act === 'fwd10') v.currentTime = Math.min((v.duration || 0) - .5, v.currentTime + 10);
+    if (act === 'sound') { toggleSound(); v.muted = Sound.muted; $('[data-act="sound"]', th).textContent = Sound.muted ? 'Sound off' : 'Sound on'; }
+    if (act === 'original') openOriginal(theatre.featuredWorld);
+    if (act === 'close') closeTheatre();
+  }
+
+  /* ---------------- actions ---------------- */
+  function toggleSound() { Sound.init(); const m = Sound.toggleMute(); document.body.classList.toggle('muted', m); toast(m ? 'Sound off' : 'Sound on'); hint(); }
+  function openOriginal(w) {
+    const st = Media.FEAT[w]; if (!st) return; toast(`Opening on ${st.cfg.platform}…`);
+    const a = document.createElement('a'); a.href = st.cfg.original; a.target = '_blank'; a.rel = 'noopener'; document.body.append(a); a.click(); a.remove();
+  }
+  function videoOf(el) { if (el.classList.contains('l-row')) { const win = $('.l-window'); return win.classList.contains('flip') ? $('video.b', win) : $('video.a', win); } return el.querySelector('video'); }
+  function activate(el) {
+    if (!el) return;
+    if (el.classList.contains('tb-sound')) return toggleSound();
+    if (el.classList.contains('open-original')) return openOriginal(el.dataset.worldOriginal);
+    if (el.classList.contains('featured')) {
+      const w = state.world, st = Media.FEAT[w];
+      if (st.mode === 'local') return openTheatre(st.video.currentSrc, st.cfg.caption, w, st.video.currentTime);
+      if (st.mode === 'embed' && st.cfg.platform === 'TikTok') { st.playing = !st.playing; Media.tiktok(w, st.playing ? 'play' : 'pause'); return toast(st.playing ? 'Playing' : 'Paused'); }
+      return openOriginal(w);
+    }
+    if (el.classList.contains('l-row') && !el.classList.contains('active')) return setDest(+el.dataset.i);
+    const v = videoOf(el); if (v && v.currentSrc) openTheatre(v.currentSrc, v.dataset.label || el.dataset.label, null, v.currentTime);
+  }
+  function playPause() {
+    if (theatre.open) return thAct('play');
+    const el = state.focusEl; if (!el) return;
+    if (el.classList.contains('featured')) {
+      const st = Media.FEAT[state.world];
+      if (st.mode === 'local') { const v = st.video; v.paused ? (v.play(), delete v.dataset.user) : (v.pause(), v.dataset.user = 'paused'); return toast(v.paused ? 'Paused' : 'Playing'); }
+      if (st.mode === 'embed') return activate(el);
+    }
+    const v = videoOf(el); if (v) { v.paused ? v.play().catch(() => {}) : v.pause(); toast(v.paused ? 'Paused' : 'Playing'); }
+  }
+
+  /* ---------------- BACK: close things first, never exit by accident ---------------- */
+  let backArmed = 0;
+  function back() {
+    if (theatre.open) return closeTheatre();
+    if (state.screen === 'intro') return;
+    const list = items();
+    if (state.focusEl && state.focusEl !== list[1]) { setFocus(list[1]); return; }
+    if (performance.now() - backArmed < 2600) { toast('Leaving Ishmail Worlds'); return setTimeout(() => Remote.leave(), 400); }
+    backArmed = performance.now(); toast('Press BACK again to leave');
+  }
 
   /* ---------------- input ---------------- */
-  function togglePause() {
-    const w = current in CFG ? $(`#world-${current}`) : $('#hub'); const vs = $$('video', w); const anyPlaying = vs.some(v => !v.paused);
-    vs.forEach(v => anyPlaying ? v.pause() : v.play().catch(() => {})); toast(anyPlaying ? 'Paused' : 'Playing');
+  function firstInput() {
+    if (state.firstInput) return; state.firstInput = true; Sound.init();
+    const el = document.documentElement, fs = el.requestFullscreen || el.webkitRequestFullscreen;
+    if (fs && !document.fullscreenElement) { try { const p = fs.call(el, { navigationUI: 'hide' }); if (p && p.catch) p.catch(() => {}); } catch (e) {} }
+    if (state.screen === 'intro' && !intro.boomed) { intro.boomed = true; Sound.boom(); }
+    if (state.screen === 'world') Sound.world(state.world);
   }
-  function fullscreen() { if (!document.fullscreenElement) document.documentElement.requestFullscreen?.().catch(() => {}); else document.exitFullscreen?.(); }
-
-  addEventListener('keydown', e => {
-    const k = e.key; Sound.init();
-    if (k === 'f' || k === 'F') return fullscreen();
-    if (k === 'm' || k === 'M') { const mu = Sound.toggleMute(); return toast(mu ? 'Sound off' : 'Sound on'); }
-    if (k === '?' || k === '/') { $('#help').classList.toggle('open'); return; }
-    if (current === 'intro') { if (['Enter', ' ', 'Escape'].includes(k) || k.length === 1) { e.preventDefault(); if (!introStarted) startIntroSound(); goHub(true); } return; }
-    if (['1', '2', '3'].includes(k)) { closeOverlays(); const w = WORLDS[+k - 1]; return current === 'hub' ? enterWorld(w, $$('.portal')[+k - 1]) : enterWorld(w, null); }
-    if (k === 'Escape' || k === 'Backspace' || k === 'BrowserBack' || k === 'h' || k === 'H') { e.preventDefault(); if (closeOverlays()) return; if (current !== 'hub') goHub(); return; }
-    if ($('#lightbox.open')) return;
-    if (current === 'hub') {
-      if (k === 'ArrowLeft') { focusPortal(hubIndex - 1); Sound.tick(); }
-      if (k === 'ArrowRight') { focusPortal(hubIndex + 1); Sound.tick(); }
-      if (k === 'Enter' || k === ' ') { e.preventDefault(); enterWorld(WORLDS[hubIndex], $$('.portal')[hubIndex]); }
+  Remote.on((a) => {
+    firstInput();
+    if (theatre.open) {
+      const wasIdle = th.classList.contains('idle'); thWake();
+      if (a === 'back') return closeTheatre();
+      if (a === 'playpause') return thAct('play');
+      if (wasIdle) return;               // first press just brings the controls back
+      const b = visibleBtns();
+      if (a === 'left') return thFocus(theatre.idx - 1);
+      if (a === 'right') return thFocus(theatre.idx + 1);
+      if (a === 'ok') return thAct(b[theatre.idx].dataset.act);
       return;
     }
-    if (k === 'ArrowLeft') { e.preventDefault(); moveFocus(-1, 0); } if (k === 'ArrowRight') { e.preventDefault(); moveFocus(1, 0); }
-    if (k === 'ArrowUp') { e.preventDefault(); moveFocus(0, -1); } if (k === 'ArrowDown') { e.preventDefault(); moveFocus(0, 1); }
-    if (k === 'Enter' && focused) openLightbox(focused);
-    if (k === ' ') { e.preventDefault(); togglePause(); }
-    if (k === 'o' || k === 'O') openOriginal();
-    if ((k === 'c' || k === 'C') && featured[current] && featured[current].cfg.platform === 'instagram' && featured[current].rebuild) {
-      const st = featured[current]; st.cfg.crop = st.cfg.crop === false; st.rebuild(); toast(st.cfg.crop ? 'Showing just the video' : 'Showing the full Instagram post'); }
-    if (k === 'q' || k === 'Q') { if (current === 'city') cityQuote(true); if (current === 'empire') empireQuote(true); }
-    if ((k === 'l' || k === 'L') && current === 'city') lightning();
-    if ((k === 'r' || k === 'R') && current === 'drive') rev();
+    if (state.screen === 'intro') {
+      if (!intro.doors) return intro.showDoors();
+      if (a === 'left') return intro.select(intro.sel - 1);
+      if (a === 'right') return intro.select(intro.sel + 1);
+      if (a === 'ok') return intro.enter();
+      return;
+    }
+    if (a === 'left') return step(-1);
+    if (a === 'right') return step(1);
+    if (a === 'up') return move(-1);
+    if (a === 'down') return move(1);
+    if (a === 'ok') return activate(state.focusEl);
+    if (a === 'back') return back();
+    if (a === 'playpause') return playPause();
   });
-
+  // pointer / touch remotes
   document.addEventListener('click', e => {
-    Sound.init();
-    if (current === 'intro') { startIntroSound(); return goHub(true); }
-    if (e.target.closest('a')) return;
-    if (e.target.closest('#lightbox, #help')) { if (!e.target.closest('.lb-media, .help-card')) closeOverlays(); return; }
-    const portal = e.target.closest('.portal'); if (portal) { const i = $$('.portal').indexOf(portal); focusPortal(i); return enterWorld(WORLDS[i], portal); }
-    const p = e.target.closest('.panel, .featured-host'); if (p) { setFocus(p, true); openLightbox(p); }
+    firstInput();
+    const t = e.target;
+    if (theatre.open) { const b = t.closest('.th-btn'); if (b) { thFocus(visibleBtns().indexOf(b)); thAct(b.dataset.act); } else thWake(); return; }
+    const door = t.closest('.door'); if (door && state.screen === 'intro') { if (!intro.doors) intro.showDoors(); intro.select([...$$('.door')].indexOf(door)); return intro.enter(); }
+    const edge = t.closest('.edge'); if (edge) return step(+edge.dataset.dir);
+    const dot = t.closest('[data-go]'); if (dot) { const i = ORDER.indexOf(dot.dataset.go), c = ORDER.indexOf(state.world); return enterWorld(dot.dataset.go, i > c ? 1 : -1); }
+    const f = t.closest('[data-focus]'); if (f && state.screen === 'world') { setFocus(f, true); activate(f); }
   });
-  $$('.portal').forEach((p, i) => p.addEventListener('mouseenter', () => { if (current === 'hub' && hubIndex !== i) { focusPortal(i); Sound.tick(); } }));
+  // embeds can grab focus when clicked; hand it back so the remote keeps working
+  addEventListener('blur', () => setTimeout(() => { if (document.activeElement && document.activeElement.tagName === 'IFRAME') { document.activeElement.blur(); state.focusEl && state.focusEl.focus({ preventScroll: true }); } }, 1500));
+  document.addEventListener('visibilitychange', () => { if (document.hidden) $$('video').forEach(v => v.pause()); else if (state.screen === 'world') Media.schedule($(`#w-${state.world}`), state.focusEl); });
 
-  // hide the cursor when idle (projector-friendly)
-  let idleT; addEventListener('mousemove', () => { document.body.classList.remove('hide-cursor'); clearTimeout(idleT); idleT = setTimeout(() => document.body.classList.add('hide-cursor'), 2500); });
+  /* ---------------- toast ---------------- */
+  let toastT; function toast(m) { const t = $('#toast'); t.textContent = m; t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 2200); }
 
-  /* ---------------- intro ---------------- */
-  let introStarted = false;
-  function startIntroSound() { if (introStarted) return; Sound.init(); if (Sound.running) { introStarted = true; Sound.boom(); } }
-  function intro() {
-    const t = $('#introTitle'), words = 'WELCOME BACK, ', name = CFG.name + '.';
-    let i = 0; const span = (ch, cls = '') => `<span class="${cls}" style="animation-delay:${(.25 + (i++) * .07).toFixed(2)}s">${ch === ' ' ? '&nbsp;' : ch}</span>`;
-    t.innerHTML = [...words].map(c => span(c)).join('') + [...name].map(c => span(c, 'name')).join('');
-    FX.intro($('#introCanvas')); FX.start('intro'); $('#intro').classList.add('play');
-    Sound.init(); setTimeout(startIntroSound, 200);
-    setTimeout(() => { if (current === 'intro') goHub(true); }, 9000);
-  }
+  /* ---------------- WELCOME sequence ---------------- */
+  const intro = {
+    sel: Math.max(0, ORDER.indexOf(C.autoEnterWorld)), doors: false, timer: 0, boomed: false,
+    start() {
+      const s1 = 'WELCOME BACK,', s2 = C.name + '.';
+      $('.it-1').innerHTML = [...s1].map((c, i) => `<span style="animation-delay:${(.3 + i * .05).toFixed(2)}s">${c === ' ' ? '&nbsp;' : c}</span>`).join('');
+      $('.it-2').innerHTML = [...s2].map((c, i) => `<span style="animation-delay:${(1.1 + i * .08).toFixed(2)}s">${c}</span>`).join('');
+      $('#intro').classList.add('play'); FX.start('introDust');
+      $$('#intro video').forEach(v => v.play().catch(() => {}));
+      this.t1 = setTimeout(() => this.showDoors(), 4300);
+    },
+    showDoors() {
+      if (this.doors) return; this.doors = true; clearTimeout(this.t1);
+      $('#intro').classList.add('doors-up'); this.select(this.sel, true);
+    },
+    select(i, silent) {
+      this.sel = (i + 3) % 3; $$('.door').forEach((d, k) => d.classList.toggle('sel', k === this.sel));
+      if (!silent) Sound.tick();
+      // the timer restarts whenever you choose
+      clearTimeout(this.timer); const bar = $$('.door-timer i')[this.sel], ms = Math.max(3000, (C.autoEnterAfter - 4.3) * 1000);
+      $$('.door-timer i').forEach(b => { b.style.transition = 'none'; b.style.width = '0'; });
+      void bar.offsetWidth; bar.style.transition = `width ${ms}ms linear`; bar.style.width = '100%';
+      this.timer = setTimeout(() => this.enter(), ms);
+    },
+    enter() {
+      if (state.screen !== 'intro' || this.entering) return; this.entering = true; clearTimeout(this.timer); clearTimeout(this.t1);
+      const door = $$('.door')[this.sel], w = ORDER[this.sel];
+      const r = door.getBoundingClientRect(), s = stage.getBoundingClientRect(), k = 1920 / s.width;
+      const x = (r.left - s.left) * k, y = (r.top - s.top) * k, dw = r.width * k, dh = r.height * k;
+      const sc = Math.max(1920 / dw, 1080 / dh) * 1.02;
+      $('#intro').classList.add('entering'); door.classList.add('zoom');
+      door.style.transform = `translate(${960 - (x + dw / 2)}px, ${540 - (y + dh / 2)}px) scale(${sc})`;
+      Sound.whoosh(1.4);
+      setTimeout(() => {
+        state.screen = 'world'; app.classList.add('on'); enterWorld(w, 0);
+        $('#intro').classList.remove('active'); hint();
+        setTimeout(() => { FX.stop('introDust'); Media.pauseAll($('#intro')); }, 1200);
+      }, 1150);
+    }
+  };
 
-  /* ---------------- boot ---------------- */
-  buildCity(); buildDrive(); buildEmpire();
-  FX.rain($('.portal-rain'), 'portalRain', { count: 140, wind: 1.6, floor: 20 });
-  window.addEventListener('online', () => toast('Back online — reload (Ctrl+R) to load the embeds'));
-  const jump = location.hash.slice(1);
-  if (WORLDS.includes(jump)) { current = 'hub'; show('hub'); enterWorld(jump, null); }
-  else if (jump === 'hub') { current = 'hubpending'; goHub(false); }
-  else intro();
-  window.__worlds = { featured, get current() { return current; } }; // for testing
+  Remote.arm();
+  intro.start();
+  window.__iw = { state, theatre, intro, items, enterWorld, FEAT: Media.FEAT, lite };
 })();

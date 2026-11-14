@@ -1,95 +1,67 @@
 # Ishmail Worlds
 
-A cinematic, three-world entertainment screen for the Nebula Mars 3 Air (or any 16:9 screen).
-It's plain HTML, CSS and JavaScript. Nothing to install, no subscriptions, no hosting.
+A cinematic, remote-controlled entertainment screen for the Nebula Mars 3 Air.
+It opens with **WELCOME BACK, ISHMAIL.**, reveals three destinations and then glides into **GOTHAM**.
+From there, LEFT and RIGHT take you between **GOTHAM**, **PORSCHE** and **BUSINESS & LIFESTYLE**.
 
-```
-WELCOME BACK, ISHMAIL.  →  choose a portal  →  DARK CITY · DRIVE · EMPIRE
-```
+## Using the remote
 
-## 1. Launch it
-
-**Easiest (Windows):** double-click **`Launch Ishmail Worlds.bat`**.
-It opens Chrome full-screen with sound allowed to start straight away, using its own small Chrome profile so your normal Chrome isn't affected.
-
-**Manual:** open `index.html` in Chrome and press **F** for fullscreen. Without the launcher, Chrome keeps sound off until your first key press or click. That's normal.
-
-## 2. Get it on the projector
-
-The Mars 3 Air has Chromecast built in. With the laptop and projector on the same Wi-Fi:
-
-1. Launch Ishmail Worlds in Chrome.
-2. Open Chrome's **⋮ menu → Cast, save and share → Cast…**
-3. Under **Sources**, pick **Cast tab** (sends picture and sound), then pick the Mars 3 Air.
-
-You can also connect the laptop by **HDMI**, which gives the smoothest playback.
-Control everything from the laptop keyboard.
-
-## 3. Controls
-
-| Key | What it does |
+| Button | What it does |
 |---|---|
-| **Enter** / click | Skip the intro · enter a world · enlarge the selected panel |
-| **← → ↑ ↓** | Move between portals or between media panels |
-| **1 2 3** | Jump to Dark City / Drive / Empire from anywhere |
-| **Esc** (or Backspace / H) | Close a panel, or go back to world selection |
-| **O** | Open the featured reel on TikTok / Instagram |
-| **C** | Instagram reels: show just the video ↔ the full Instagram post |
-| **Space** | Pause / play every video in the current world |
-| **M** | Sound on / off |
-| **F** | Fullscreen |
-| **Q** | Next quote |
-| **L** | Lightning strike (Dark City) |
-| **R** | Rev the engine (Drive) |
-| **?** | Show all controls |
+| **◀ LEFT / RIGHT ▶** | Switch world: Gotham ⇄ Porsche ⇄ Business & Lifestyle (it wraps around) |
+| **▲ UP / DOWN ▼** | Move between the screens in the world you're in, top to bottom |
+| **OK** | Open the selected screen full-screen with sound. On a destination, show it. On *Sound*, turn sound on or off |
+| **BACK** | Close the full-screen player → return to the main screen → (press twice) leave |
+| **PLAY / PAUSE** | Pause or play the selected video (or the full-screen one) |
+| **Volume** | Your projector's own volume, as normal |
 
-All sound (rain, thunder, the six-cylinder engine, the Empire pad and chimes) is generated live in the browser. There are no audio files.
+In the full-screen player, LEFT and RIGHT move between its buttons (−10s, Pause, +10s, Sound, Close). Those are the only times LEFT and RIGHT control a video. Everywhere else they switch worlds.
 
-## 4. The three worlds
+You never need a keyboard, a mouse or menus. A small hint at the bottom shows what OK will do, then fades away.
 
-| | Dark City | Drive | Empire |
-|---|---|---|---|
-| Feel | Rain-soaked night city, surveillance | Dark showroom, signal red | Golden hour, luxury, calm |
-| Type | Oswald + JetBrains Mono | Saira (wide, technical) | Cormorant Garamond + Jost |
-| Layout | HUD columns of CCTV feeds around a "case file" | One huge floating display + 2×2 garage bays + shift-light rev strip | Arched centrepiece, quote column, round watch dial |
-| Live effects | Canvas rain + splashes, searchlights, lightning + thunder, typed "intercept" quotes, ticker | Light sweep, engine start-up, R-to-rev with LEDs and shake | Drifting gold dust, word-by-word quotes, warm pad |
-| Featured | Your TikTok (Alfred / Bruce Wayne clip) | Your Instagram reel `Dbi7uqvJABz` | Your Instagram reel `DeAEWPmNvNb` |
+## Your three reels (already built in)
 
-## 5. Featured reels and blocked embeds
+| World | File | What it is |
+|---|---|---|
+| Gotham | `assets/videos/gotham/featured.mp4` | Alfred & Bruce Wayne (TikTok, @oev.aep) |
+| Porsche | `assets/videos/porsche/featured.mp4` | 911 GT3 RS after dark (Instagram, @alexerwn) |
+| Business & Lifestyle | `assets/videos/lifestyle/featured.mp4` | Night drive (Instagram) |
 
-Each featured slot tries three things, in order:
+They play directly on the screen: no Instagram or TikTok app, no white bars, no QR codes.
+If a featured file is ever missing, that screen falls back to the official embed and an **Open on Instagram / TikTok** button appears beneath it.
 
-1. **A local copy.** If `media/featured/city_featured.mp4` (or `drive_featured.mp4` / `empire_featured.mp4`) exists, it plays from your computer. This works **offline** and is the most reliable.
-2. **The official embed.** Your TikTok and Instagram links are embedded live. The TikTok number is already filled in (`7541735536759786774`). Instagram embeds usually need a click on the video to start. With **C** on (the default), Instagram's header and footer are trimmed off so only the video shows. If the picture ever looks misaligned, press **C** to see the full post, or set `crop: false` in `js/config.js`.
-3. **A clear fallback.** If you're offline or the platform refuses to play, the slot shows a QR code to watch on your phone and an **Open original** button (or press **O**). It never swaps in unrelated footage.
+## Adding or replacing videos
 
-Tested: I confirmed in a real browser that all three reels exist and play on TikTok's and Instagram's own embed players. I could **not** test them playing *inside this page*: my test machine has no internet, and the Claude app's browser blocks third-party frames. If one stays blank on your laptop, use **O** or add a local copy.
+Every screen has a fixed filename. Save an MP4 with that name in the matching folder and it replaces that screen automatically. You don't need to edit anything else.
+Each folder contains a `PUT_VIDEOS_HERE.txt` listing its names:
 
-## 6. Add or replace videos
+```
+assets/videos/gotham/      featured, background, feed-1 … feed-4
+assets/videos/porsche/     featured, background, display-1 … display-4
+assets/videos/lifestyle/   featured, background, collection-1 … collection-5,
+                           dest-dubai, dest-maldives, dest-amalfi, dest-newyork, dest-london
+```
 
-All media lives in `media/`, and all settings live in **`js/config.js`**. That's the only file you need to edit.
+Each screen tries, in order:
+1. **Your file** in `assets/videos/…`
+2. **Online footage**: free-licensed Pexels clips (needs internet)
+3. **A built-in loop** from `assets/fallback/` (works offline), so nothing ever shows as a blank box
 
-- **Your character edits (Dark City):** save clips as `media/city/edit1.mp4`, `edit2.mp4`, `edit3.mp4`. They replace the placeholder loops automatically.
-- **Your car clip (Drive):** `media/drive/car1.mp4`
-- **Your lifestyle clip (Empire):** `media/empire/life1.mp4`
-- **Swap any other panel:** change its `src` in `js/config.js`, e.g. `src: "media/drive/my-911.mp4"`. Images (`.jpg`, `.png`, `.webp`) work too.
-- **Background of a world:** change `background:` for that world.
-- **Quotes:** edit the `quotes:` lists. These are written for this app; replace them with your own favourites.
-- **Name on the intro:** `name: "ISHMAIL"` at the top of the file.
+Tips: use MP4 (H.264). 720p or 1080p landscape works best. Labels, quotes and destination cities live in `js/config.js`.
 
-Tips: use **MP4 (H.264)**. 1080p or 720p at a modest bitrate keeps several videos playing smoothly at once. Panels play muted. Press **Enter** on a panel to watch it large, with sound if **M** is on.
+## Running it
 
-A panel whose file is missing shows a small yellow "Add your clip →" note and plays a built-in loop instead, so nothing ever shows as a broken box.
+**On the laptop (private version with your reels):** double-click **`Launch Ishmail Worlds.bat`**. It opens Chrome full-screen with sound allowed. Press **Alt+F4** to close it. To show it on the projector, cast the screen, or connect by HDMI and use the projector as the display.
 
-## 7. What's included
+**On the projector's own browser:** open the web link in a TV browser (for example TV Bro or another Android TV browser), then press OK once. That first press turns on full-screen and sound, because browsers need one button press before they allow either.
+The public web link doesn't include your three reels, because they belong to other creators. There, those screens use the official embeds.
 
-- `index.html`: the experience
-- `css/`: one stylesheet per world, plus the intro and hub styles
-- `js/config.js`: **your settings**
-- `js/app.js`: navigation, transitions, media handling
-- `js/audio.js`: synthesised sound
-- `js/effects.js`: rain, dust and intro particles
-- `media/`: 12 original looping videos (rendered for this project, so you own them), QR codes, and the `featured/` folder for offline copies
-- `fonts/`: open-source fonts, bundled so everything works offline
+**Projector performance:** on TV hardware the app automatically switches to a lighter mode. It plays up to 4 videos at once (the main screen, the one you've selected and the backdrop come first) and drops the heavier effects. Add `?full` to the address to force all effects, or `?lite` to force the light mode on a laptop.
 
-The built-in loops are stand-ins with an original design. Real footage of your own (Batman edits, car films, travel clips) makes the biggest difference. Drop it in and it takes over.
+## Sound
+Rain and thunder in Gotham, an engine start when you arrive in Porsche, a warm room tone in Business & Lifestyle. All of it is generated live in the browser, so there are no audio files. Select **Sound** at the top (UP from the main screen) and press OK to turn it off. Your choice is remembered.
+
+## Footage credits (Pexels, free licence)
+Gotham: Giuseppe Paoletti, Evgenij Mikhailov, Ricky Esquivel, Altaf Shah, Jul L. G. ·
+Porsche: Michael Pronin, Kampus Production, K, Taryn Elliott ·
+Business & Lifestyle: Caleb Oquendo, Mohammed Resan, Emrul Kausar Emon, Mihaela Claudia Puscas, Sarowar Hussain, George Morina, Jourean van Beek, TR Studio, Yunus Terk, AP Vibes, Sergey Meshkov.

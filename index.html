@@ -3,189 +3,167 @@
 <head>
 <meta charset="utf-8">
 <title>Ishmail Worlds</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#000000">
 <link rel="stylesheet" href="css/fonts.css">
-<link rel="stylesheet" href="css/base.css">
-<link rel="stylesheet" href="css/intro-hub.css">
-<link rel="stylesheet" href="css/city.css">
-<link rel="stylesheet" href="css/drive.css">
-<link rel="stylesheet" href="css/empire.css">
+<link rel="stylesheet" href="css/core.css">
+<link rel="stylesheet" href="css/intro.css">
+<link rel="stylesheet" href="css/gotham.css">
+<link rel="stylesheet" href="css/porsche.css">
+<link rel="stylesheet" href="css/lifestyle.css">
 </head>
 <body>
 <div id="viewport">
 <div id="stage">
 
-  <!-- ============================== INTRO ============================== -->
+  <!-- =========================== WELCOME =========================== -->
   <section id="intro" class="screen active">
-    <canvas id="introCanvas" width="1920" height="1080"></canvas>
-    <div class="intro-line"></div>
-    <h1 class="intro-title" id="introTitle"></h1>
-    <div class="intro-sub">THREE WORLDS ARE WAITING</div>
-    <div class="intro-hint">PRESS <b>ENTER</b> OR CLICK</div>
-  </section>
-
-  <!-- ============================== HUB ============================== -->
-  <section id="hub" class="screen">
-    <video class="hub-bg" src="media/city/city_searchlight.mp4" muted loop playsinline></video>
-    <header class="hub-top">
-      <div class="hub-greet"><span class="hub-greet-small">Good evening</span><span class="hub-greet-name">Ishmail</span></div>
-      <div class="hub-clock"><span class="clock-hm" data-clock="hm"></span><span class="clock-date" data-clock="date"></span></div>
-    </header>
-
-    <div class="portals">
-      <button class="portal portal-city" data-world="city">
-        <div class="portal-frame">
-          <video src="media/city/city_rain.mp4" muted loop playsinline></video>
-          <canvas class="portal-rain" width="520" height="780"></canvas>
-          <div class="portal-beam"></div>
-        </div>
-        <div class="portal-copy">
-          <span class="portal-num">01</span>
-          <span class="portal-title">DARK CITY</span>
-          <span class="portal-sub">Night &middot; Rain &middot; Watch</span>
-        </div>
+    <div class="beams"><i></i><i></i><i></i><i></i></div>
+    <canvas id="dust" width="1920" height="1080"></canvas>
+    <div class="intro-title">
+      <div class="it-1"></div>
+      <div class="it-2"></div>
+      <div class="it-flare"></div>
+    </div>
+    <div class="doors">
+      <button class="door d-gotham" data-world="gotham">
+        <span class="door-media"><video muted loop playsinline data-slot="gotham/background"></video></span>
+        <span class="door-name">GOTHAM</span>
+        <span class="door-timer"><i></i></span>
       </button>
-
-      <button class="portal portal-drive" data-world="drive">
-        <div class="portal-frame">
-          <video src="media/drive/drive_tunnel.mp4" muted loop playsinline></video>
-          <div class="portal-redline"></div>
-        </div>
-        <div class="portal-copy">
-          <span class="portal-num">02</span>
-          <span class="portal-title">DRIVE</span>
-          <span class="portal-sub">SPEED &middot; SOUND &middot; STEEL</span>
-        </div>
+      <button class="door d-porsche" data-world="porsche">
+        <span class="door-media"><video muted loop playsinline data-slot="porsche/background"></video></span>
+        <span class="door-name">PORSCHE</span>
+        <span class="door-timer"><i></i></span>
       </button>
-
-      <button class="portal portal-empire" data-world="empire">
-        <div class="portal-frame">
-          <video src="media/empire/empire_golden.mp4" muted loop playsinline></video>
-        </div>
-        <div class="portal-copy">
-          <span class="portal-num">III</span>
-          <span class="portal-title">Empire</span>
-          <span class="portal-sub">Business &middot; Travel &middot; Time</span>
-        </div>
+      <button class="door d-lifestyle" data-world="lifestyle">
+        <span class="door-media"><video muted loop playsinline data-slot="lifestyle/background"></video></span>
+        <span class="door-name">Business <em>&amp;</em> Lifestyle</span>
+        <span class="door-timer"><i></i></span>
       </button>
     </div>
-
-    <footer class="keys">
-      <span><kbd>&larr;</kbd><kbd>&rarr;</kbd> choose</span>
-      <span><kbd>Enter</kbd> enter world</span>
-      <span><kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> jump</span>
-      <span><kbd>F</kbd> fullscreen</span>
-      <span><kbd>M</kbd> sound</span>
-      <span><kbd>?</kbd> all controls</span>
-    </footer>
   </section>
 
-  <!-- ============================== WORLD 1: DARK CITY ============================== -->
-  <section id="world-city" class="screen world">
-    <video class="w-bg" muted loop playsinline></video>
-    <div class="city-beam b1"></div><div class="city-beam b2"></div>
-    <canvas class="city-rain" width="1920" height="1080"></canvas>
-    <div class="city-flash"></div>
-    <div class="city-vignette"></div>
-
-    <header class="city-top">
-      <div class="city-brand">
-        <span class="city-title" data-text="DARK CITY">DARK CITY</span>
-        <span class="city-subtitle">NIGHT OPERATIONS <i>//</i> SECTOR 07 <i>//</i> <b class="rec">● LIVE</b></span>
-      </div>
-      <div class="city-clock">
-        <span data-clock="hms"></span>
-        <small data-clock="dateUpper"></small>
+  <!-- =========================== WORLDS =========================== -->
+  <div id="app" data-world="gotham">
+    <header id="topbar">
+      <div class="tb-title"></div>
+      <nav class="tb-dots"><button data-go="gotham"></button><button data-go="porsche"></button><button data-go="lifestyle"></button></nav>
+      <div class="tb-right">
+        <button class="tb-sound" data-focus="sound" aria-label="Sound"><span class="snd-on">Sound on</span><span class="snd-off">Sound off</span></button>
+        <div class="tb-clock"><b data-clock="hm"></b><small data-clock="date"></small></div>
       </div>
     </header>
+    <button class="edge prev" data-dir="-1"><i></i><span></span></button>
+    <button class="edge next" data-dir="1"><span></span><i></i></button>
 
-    <div class="city-col left" data-slot="left"></div>
-    <div class="city-center">
-      <div class="city-featured" data-featured="city"></div>
-    </div>
-    <div class="city-col right" data-slot="right">
-      <div class="city-quote" tabindex="-1">
-        <div class="cq-head"><span>INTERCEPT</span><span class="cq-count"></span></div>
-        <blockquote class="cq-text"></blockquote>
-        <div class="cq-by"></div>
-        <div class="cq-wave"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    <!-- ---------------- GOTHAM: the cave ---------------- -->
+    <section id="w-gotham" class="world">
+      <video class="bg" muted loop playsinline data-slot="gotham/background"></video>
+      <div class="g-grade"></div>
+      <div class="g-beam a"></div><div class="g-beam b"></div><div class="g-beam c"></div>
+      <canvas class="g-rain" width="1920" height="1080"></canvas>
+      <div class="g-flash"></div>
+      <svg class="g-cave" viewBox="0 0 1920 1080" preserveAspectRatio="none" aria-hidden="true">
+        <defs>
+          <linearGradient id="rock" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#010204"/><stop offset="1" stop-color="#05080e"/></linearGradient>
+          <radialGradient id="rim" cx=".5" cy="0" r="1"><stop offset="0" stop-color="#2a4a78" stop-opacity=".35"/><stop offset=".6" stop-color="#2a4a78" stop-opacity="0"/></radialGradient>
+        </defs>
+        <path fill="url(#rock)" d="M0 0H1920V40C1830 70 1800 150 1760 120 1720 95 1700 190 1650 160 1610 135 1580 60 1520 80 1470 98 1440 40 1380 55 1330 70 1300 20 1240 30 1180 40 1150 10 1090 25 1040 38 1000 12 960 20 910 30 880 8 820 24 760 40 740 12 680 30 620 48 600 20 540 40 480 60 460 110 400 85 350 62 320 140 270 120 220 98 200 190 150 165 110 140 70 60 0 50Z"/>
+        <path fill="url(#rock)" d="M0 1080V700C30 720 50 820 80 880 110 940 90 1000 140 1080Z"/>
+        <path fill="url(#rock)" d="M1920 1080V680C1890 700 1872 800 1840 870 1808 940 1830 1010 1780 1080Z"/>
+        <path fill="url(#rim)" d="M0 0H1920V160H0Z"/>
+      </svg>
+
+      <div class="g-wall">
+        <div class="g-wing left">
+          <button class="mon feed" data-focus data-slot="gotham/feed-1"><video muted loop playsinline></video><span class="mon-label"></span></button>
+          <button class="mon feed" data-focus data-slot="gotham/feed-2"><video muted loop playsinline></video><span class="mon-label"></span></button>
+        </div>
+        <div class="g-center">
+          <button class="g-hero featured" data-focus data-featured="gotham"><span class="feat-media"></span><span class="hero-cap"></span></button>
+          <button class="open-original" data-focus="original" data-world-original="gotham"></button>
+        </div>
+        <div class="g-wing right">
+          <button class="mon feed" data-focus data-slot="gotham/feed-3"><video muted loop playsinline></video><span class="mon-label"></span></button>
+          <button class="mon feed" data-focus data-slot="gotham/feed-4"><video muted loop playsinline></video><span class="mon-label"></span></button>
+        </div>
       </div>
-    </div>
-    <div class="city-ticker"><div class="ticker-track"></div></div>
-  </section>
 
-  <!-- ============================== WORLD 2: DRIVE ============================== -->
-  <section id="world-drive" class="screen world">
-    <video class="w-bg" muted loop playsinline></video>
-    <div class="drive-shade"></div>
-    <div class="drive-topline"></div>
-
-    <header class="drive-top">
-      <div class="drive-mark"><span class="drive-word">DRIVE</span><span class="drive-sweep"></span></div>
-      <div class="drive-tag"></div>
-      <div class="drive-clock"><span class="dc-hm" data-clock="hm"></span><span class="dc-s" data-clock="s"></span><small data-clock="dayUpper"></small></div>
-    </header>
-
-    <div class="drive-feature" data-featured="drive"></div>
-    <div class="drive-bays" data-slot="bays"></div>
-
-    <div class="drive-rev">
-      <div class="rev-leds"></div>
-      <div class="rev-readout"><span class="rev-num">0900</span><small>RPM</small></div>
-      <div class="rev-hint"><kbd>R</kbd> REV &nbsp; <kbd>Space</kbd> PAUSE</div>
-    </div>
-  </section>
-
-  <!-- ============================== WORLD 3: EMPIRE ============================== -->
-  <section id="world-empire" class="screen world">
-    <video class="w-bg" muted loop playsinline></video>
-    <div class="empire-wash"></div>
-    <canvas class="empire-dust" width="1920" height="1080"></canvas>
-
-    <header class="empire-top">
-      <div class="empire-loc">London</div>
-      <div class="empire-mark">
-        <span class="em-title">Empire</span>
-        <span class="em-sub">Business &nbsp;·&nbsp; Travel &nbsp;·&nbsp; Time &nbsp;·&nbsp; Form</span>
+      <div class="g-desk">
+        <div class="g-table"><svg class="g-map" viewBox="0 0 1000 560" aria-hidden="true"></svg><div class="g-sweep"></div></div>
+        <div class="g-wordmark">GOTHAM</div>
       </div>
-      <div class="empire-clock"><span data-clock="hm12"></span><small data-clock="dateLong"></small></div>
-    </header>
+      <div class="g-bats"></div>
+    </section>
 
-    <div class="empire-left">
-      <div class="empire-quote">
-        <span class="eq-mark">&ldquo;</span>
-        <p class="eq-text"></p>
-        <div class="eq-by"><i></i><span></span></div>
+    <!-- ---------------- PORSCHE: the private studio ---------------- -->
+    <section id="w-porsche" class="world">
+      <video class="bg" muted loop playsinline data-slot="porsche/background"></video>
+      <div class="p-shade"></div>
+      <div class="p-ceiling"><i></i><i></i><i></i><i></i><i></i></div>
+      <div class="p-floor"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      <div class="p-hero-wrap">
+        <button class="p-hero featured" data-focus data-featured="porsche"><span class="feat-media"></span><span class="p-glass"></span><span class="hero-cap"></span></button>
+        <div class="p-track">
+          <svg viewBox="0 0 1150 40" preserveAspectRatio="none"><path class="p-track-line" d="M0 30 C120 30 160 8 300 8 S470 30 600 30 760 6 900 10 1060 30 1150 28"/><path class="p-track-done" d="M0 30 C120 30 160 8 300 8 S470 30 600 30 760 6 900 10 1060 30 1150 28"/><circle class="p-car" r="6"/></svg>
+          <span class="p-time"></span>
+          <button class="open-original" data-focus="original" data-world-original="porsche"></button>
+        </div>
       </div>
-      <div class="empire-slot-coast" data-slot="coast"></div>
-    </div>
-    <div class="empire-feature" data-featured="empire"></div>
-    <div class="empire-right" data-slot="right"></div>
-    <div class="empire-watch-slot" data-slot="watch"></div>
-  </section>
+      <div class="p-stack">
+        <button class="p-disp" data-focus data-slot="porsche/display-1"><video muted loop playsinline></video><span class="p-cap"></span></button>
+        <button class="p-disp" data-focus data-slot="porsche/display-2"><video muted loop playsinline></video><span class="p-cap"></span></button>
+        <button class="p-disp" data-focus data-slot="porsche/display-3"><video muted loop playsinline></video><span class="p-cap"></span></button>
+        <button class="p-disp" data-focus data-slot="porsche/display-4"><video muted loop playsinline></video><span class="p-cap"></span></button>
+      </div>
+    </section>
 
-  <!-- ============================== OVERLAYS ============================== -->
-  <div id="lightbox" class="overlay">
-    <div class="lb-inner"><div class="lb-media"></div><div class="lb-title"></div><div class="lb-close"><kbd>Esc</kbd> close</div></div>
+    <!-- ---------------- BUSINESS & LIFESTYLE: the members' room ---------------- -->
+    <section id="w-lifestyle" class="world">
+      <video class="bg" muted loop playsinline data-slot="lifestyle/background"></video>
+      <div class="l-room"></div>
+      <div class="l-panel left"></div><div class="l-panel right"></div>
+      <canvas class="l-dust" width="1920" height="1080"></canvas>
+
+      <div class="l-dest">
+        <div class="l-window"><video class="a" muted loop playsinline></video><video class="b" muted loop playsinline></video><span class="l-window-name"></span></div>
+        <ul class="l-list"></ul>
+      </div>
+
+      <div class="l-centre">
+        <button class="l-hero featured" data-focus data-featured="lifestyle"><span class="feat-media"></span><span class="hero-cap"></span></button>
+        <button class="l-strip" data-focus data-slot="lifestyle/collection-5"><video muted loop playsinline></video><span class="l-quote"></span></button>
+        <button class="open-original" data-focus="original" data-world-original="lifestyle"></button>
+      </div>
+
+      <div class="l-coll">
+        <button class="l-frame" data-focus data-slot="lifestyle/collection-1"><video muted loop playsinline></video><span class="l-cap"></span></button>
+        <button class="l-frame" data-focus data-slot="lifestyle/collection-2"><video muted loop playsinline></video><span class="l-cap"></span></button>
+        <button class="l-frame" data-focus data-slot="lifestyle/collection-3"><video muted loop playsinline></video><span class="l-cap"></span></button>
+        <button class="l-frame" data-focus data-slot="lifestyle/collection-4"><video muted loop playsinline></video><span class="l-cap"></span></button>
+      </div>
+    </section>
+
+    <div id="hint"></div>
   </div>
 
-  <div id="help" class="overlay">
-    <div class="help-card">
-      <h2>Controls</h2>
-      <div class="help-grid">
-        <div class="hr"><span class="k"><kbd>1</kbd><kbd>2</kbd><kbd>3</kbd></span><span>Jump to Dark City / Drive / Empire</span></div>
-        <div class="hr"><span class="k"><kbd>Esc</kbd></span><span>Back to world selection (or close a panel)</span></div>
-        <div class="hr"><span class="k"><kbd>&larr;</kbd><kbd>&rarr;</kbd><kbd>&uarr;</kbd><kbd>&darr;</kbd></span><span>Move between portals or media panels</span></div>
-        <div class="hr"><span class="k"><kbd>Enter</kbd></span><span>Enter a world / expand the selected panel</span></div>
-        <div class="hr"><span class="k"><kbd>O</kbd></span><span>Open the featured reel on TikTok / Instagram</span></div>
-        <div class="hr"><span class="k"><kbd>C</kbd></span><span>Instagram: video only / full post</span></div>
-        <div class="hr"><span class="k"><kbd>Space</kbd></span><span>Pause / play all videos in the world</span></div>
-        <div class="hr"><span class="k"><kbd>M</kbd></span><span>Sound on / off</span></div>
-        <div class="hr"><span class="k"><kbd>F</kbd></span><span>Fullscreen</span></div>
-        <div class="hr"><span class="k"><kbd>Q</kbd></span><span>Next quote</span></div>
-        <div class="hr"><span class="k"><kbd>L</kbd></span><span>Lightning (Dark City)</span></div>
-        <div class="hr"><span class="k"><kbd>R</kbd></span><span>Rev the engine (Drive)</span></div>
-        <div class="hr"><span class="k"><kbd>?</kbd></span><span>Show / hide this help</span></div>
+  <!-- =========================== FULL-SCREEN PLAYER =========================== -->
+  <div id="theatre">
+    <div class="th-media"></div>
+    <div class="th-ui">
+      <div class="th-title"></div>
+      <div class="th-progress"><i></i></div>
+      <div class="th-row">
+        <span class="th-time"></span>
+        <div class="th-buttons">
+          <button data-act="back10" class="th-btn">−10s</button>
+          <button data-act="play" class="th-btn th-play">Pause</button>
+          <button data-act="fwd10" class="th-btn">+10s</button>
+          <button data-act="sound" class="th-btn">Sound on</button>
+          <button data-act="original" class="th-btn">Open original</button>
+          <button data-act="close" class="th-btn">Close</button>
+        </div>
       </div>
     </div>
   </div>
@@ -197,7 +175,9 @@
 
 <script src="js/config.js"></script>
 <script src="js/audio.js"></script>
-<script src="js/effects.js"></script>
+<script src="js/fx.js"></script>
+<script src="js/media.js"></script>
+<script src="js/remote.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>

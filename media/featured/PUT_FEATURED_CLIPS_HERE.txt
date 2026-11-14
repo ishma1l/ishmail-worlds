@@ -1,5 +1,0 @@
-Put offline copies of your featured clips here (optional):
-  city_featured.mp4    - Dark City featured clip
-  drive_featured.mp4   - Drive featured reel
-  empire_featured.mp4  - Empire featured reel
-If a file exists it plays instead of the TikTok/Instagram embed, and works without internet.

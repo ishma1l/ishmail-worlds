@@ -1,0 +1,10 @@
+GOTHAM — put your videos in this folder with these exact names.
+Any file here replaces that screen automatically. Missing files fall back to the built-in footage.
+Use MP4 (H.264). Landscape 1280x720 or 1920x1080 is ideal.
+
+  featured.mp4         Main centre screen (your Alfred & Bruce Wayne clip is already here)
+  background.mp4       The storm-lit city behind everything
+  feed-1.mp4           Left wall, top screen
+  feed-2.mp4           Left wall, bottom screen
+  feed-3.mp4           Right wall, top screen
+  feed-4.mp4           Right wall, bottom screen

@@ -1,0 +1,69 @@
+/* =============================================================
+   BUSINESS & LIFESTYLE — a private members' room after dark
+   espresso walnut, brass, gallery light, serif + geometric sans
+   ============================================================= */
+#app[data-world="lifestyle"] { --accent: #d9b675; }
+#app[data-world="lifestyle"] .tb-title { font: 300 46px/1 'Cormorant Garamond'; letter-spacing: .08em; color: #fbefdc; }
+#app[data-world="lifestyle"] .tb-title em { font-style: italic; color: #d9b675; }
+#app[data-world="lifestyle"] .tb-clock b { font-family: 'Cormorant Garamond'; font-weight: 300; font-style: italic; font-size: 50px; }
+#app[data-world="lifestyle"] .tb-clock small { font-family: 'Jost'; color: #d9b675; }
+#app[data-world="lifestyle"] .tb-sound { font-family: 'Jost'; font-size: 13px; letter-spacing: .3em; border-color: rgba(217,182,117,.45); color: #fbefdc; }
+#app[data-world="lifestyle"] .tb-sound.is-focus { background: #d9b675; color: #1a0f08; }
+#app[data-world="lifestyle"] .edge { font-family: 'Jost'; color: #d9b675; }
+
+#w-lifestyle { background: #120a06; color: #fbefdc; }
+#w-lifestyle .bg { filter: blur(10px) brightness(.42) saturate(1.15) sepia(.25); transform: scale(1.12); }
+.l-room { position: absolute; inset: 0; background:
+  radial-gradient(ellipse at 50% 0%, rgba(255,200,130,.18), transparent 55%),
+  linear-gradient(180deg, rgba(18,10,6,.55), rgba(18,10,6,.2) 30%, rgba(18,10,6,.75) 90%); }
+.l-panel { position: absolute; top: 0; bottom: 0; width: 120px; opacity: .85;
+  background: repeating-linear-gradient(90deg, #1b0f08 0 18px, #24140b 18px 20px, #1d1009 20px 38px, #150b06 38px 40px);
+  box-shadow: inset 0 0 60px rgba(0,0,0,.8); }
+.l-panel.left { left: -60px; } .l-panel.right { right: -60px; }
+.l-dust { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
+
+/* frames share a brass-and-mat treatment with gallery light above */
+.l-frame, .l-hero, .l-strip, .l-window { background: #0d0805;
+  box-shadow: 0 0 0 1px rgba(217,182,117,.65), 0 0 0 9px #140c07, 0 0 0 10px rgba(217,182,117,.25), 0 40px 90px rgba(0,0,0,.75); }
+.l-frame::after, .l-hero::after, .l-strip::after, .l-window::after { content: ''; position: absolute; inset: 0; z-index: 2; pointer-events: none;
+  background: linear-gradient(0deg, rgba(15,8,4,.78), transparent 48%); }
+.l-frame.is-focus, .l-hero.is-focus, .l-strip.is-focus { transform: scale(1.035);
+  box-shadow: 0 0 0 2px #e9c886, 0 0 0 10px #1a0f08, 0 0 0 11px rgba(233,200,134,.6), 0 50px 110px rgba(0,0,0,.8), 0 0 80px rgba(233,200,134,.3); }
+
+/* destinations column */
+.l-dest { position: absolute; left: 96px; top: 140px; width: 380px; z-index: 5; }
+.l-window { position: relative; width: 380px; height: 420px; overflow: hidden; }
+.l-window video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: opacity 1.4s ease; }
+.l-window video.b { opacity: 0; } .l-window.flip video.a { opacity: 0; } .l-window.flip video.b { opacity: 1; }
+.l-window-name { position: absolute; left: 26px; bottom: 22px; z-index: 3; font: 300 italic 46px/1 'Cormorant Garamond'; }
+.l-list { list-style: none; margin-top: 30px; }
+.l-row { display: flex; width: 100%; justify-content: space-between; align-items: baseline; height: 62px; padding: 0 18px; border-radius: 4px;
+  border-bottom: 1px solid rgba(217,182,117,.18); transition: background .35s, color .35s, padding .35s; }
+.l-row .n { font: 400 30px 'Cormorant Garamond'; }
+.l-row .t { font: 400 18px 'Jost'; letter-spacing: .12em; font-variant-numeric: tabular-nums; color: rgba(251,239,220,.65); }
+.l-row.active .n { color: #e9c886; font-style: italic; }
+.l-row.is-focus { background: rgba(217,182,117,.16); padding-left: 28px; box-shadow: inset 3px 0 0 #e9c886; }
+
+/* centre: featured reel + the city strip with a line of text */
+.l-centre { position: absolute; left: 530px; top: 140px; width: 860px; z-index: 5; display: flex; flex-direction: column; align-items: center; }
+.l-hero { position: relative; display: block; width: 860px; height: 484px; }
+.l-hero .feat-media video { object-fit: cover; }
+#w-lifestyle .hero-cap { font: 300 italic 34px 'Cormorant Garamond'; padding: 70px 34px 26px; z-index: 3; }
+.l-strip { position: relative; display: block; width: 860px; height: 250px; margin-top: 40px; }
+.l-strip video { filter: brightness(.7) saturate(.9); }
+.l-quote { position: absolute; inset: 0; z-index: 3; display: flex; align-items: center; justify-content: center; padding: 0 70px; text-align: center;
+  font: 300 italic 44px/1.15 'Cormorant Garamond'; color: #fff6e8; text-shadow: 0 2px 30px rgba(0,0,0,.7); transition: opacity 1.2s; }
+.l-quote.out { opacity: 0; }
+#w-lifestyle .open-original { margin-top: 22px; font-family: 'Jost'; font-size: 13px; letter-spacing: .3em; border-color: rgba(217,182,117,.5); color: #fbefdc; }
+#w-lifestyle .open-original.is-focus { background: #d9b675; color: #1a0f08; }
+
+/* the collection: four lit frames */
+.l-coll { position: absolute; left: 1444px; top: 140px; width: 380px; z-index: 5; display: flex; flex-direction: column; gap: 28px; }
+.l-frame { position: relative; display: block; width: 380px; height: 200px; }
+.l-cap { position: absolute; left: 22px; bottom: 16px; z-index: 3; font: 400 13px 'Jost'; letter-spacing: .38em; text-transform: uppercase; color: #e9c886; }
+.l-frame::before, .l-hero::before, .l-window::before { content: ''; position: absolute; left: 10%; right: 10%; top: -80px; height: 120px; z-index: -1; pointer-events: none;
+  background: radial-gradient(ellipse at 50% 100%, rgba(255,214,150,.22), transparent 70%); }
+
+/* quiet section names */
+.l-dest::before, .l-coll::before { position: absolute; top: -40px; left: 2px; font: 400 13px 'Jost'; letter-spacing: .5em; text-transform: uppercase; color: rgba(217,182,117,.85); }
+.l-dest::before { content: 'Destinations'; } .l-coll::before { content: 'The Collection'; }

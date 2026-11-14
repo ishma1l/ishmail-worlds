@@ -1,0 +1,116 @@
+/* =============================================================
+   CORE — fixed 1920×1080 stage scaled to the screen, shared UI
+   ============================================================= */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 100%; height: 100%; background: #000; overflow: hidden; }
+body { color: #fff; font-family: 'Inter', 'Segoe UI', Roboto, sans-serif; -webkit-font-smoothing: antialiased; cursor: none; }
+body.pointer { cursor: default; }
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; text-align: inherit; cursor: pointer; outline: none;
+  -webkit-tap-highlight-color: transparent; }
+video { display: block; background: #000; }
+
+#viewport { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background: #000; }
+#stage { position: relative; width: 1920px; height: 1080px; flex: none; overflow: hidden; transform-origin: center center; background: #000; }
+
+.screen { position: absolute; inset: 0; opacity: 0; visibility: hidden; transition: opacity 1s ease, visibility 0s 1s; }
+.screen.active { opacity: 1; visibility: visible; transition: opacity 1s ease, visibility 0s; }
+
+/* ---------------- worlds container ---------------- */
+#app { position: absolute; inset: 0; opacity: 0; visibility: hidden; transition: opacity 1.1s ease, visibility 0s 1.1s; }
+#app.on { opacity: 1; visibility: visible; transition: opacity 1.1s ease, visibility 0s; }
+.world { position: absolute; inset: 0; overflow: hidden; opacity: 0; visibility: hidden; pointer-events: none;
+  transition: opacity .9s ease, transform 1.1s cubic-bezier(.2,.75,.15,1), visibility 0s .9s; }
+.world.current { opacity: 1; visibility: visible; pointer-events: auto; transform: none;
+  transition: opacity .9s ease .15s, transform 1.1s cubic-bezier(.2,.75,.15,1) .1s, visibility 0s; }
+.world.from-right { transform: translateX(7%) scale(1.04); }
+.world.from-left { transform: translateX(-7%) scale(1.04); }
+.world.to-left { transform: translateX(-7%) scale(.96); }
+.world.to-right { transform: translateX(7%) scale(.96); }
+.world > .bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+
+/* every video slot fills its frame */
+[data-slot] > video, .feat-media video, .feat-media iframe { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border: 0; }
+.feat-media { position: absolute; inset: 0; overflow: hidden; background: #000; }
+[data-slot] { position: relative; overflow: hidden; }
+
+/* ---------------- top bar ---------------- */
+#topbar { position: absolute; top: 0; left: 0; right: 0; height: 110px; z-index: 30; display: flex; align-items: center;
+  justify-content: space-between; padding: 0 72px; pointer-events: none; }
+#topbar > * { pointer-events: auto; }
+.tb-title { font-size: 34px; transition: opacity .5s; white-space: nowrap; }
+.tb-dots { position: absolute; left: 50%; top: 52px; transform: translateX(-50%); display: flex; gap: 14px; }
+.tb-dots button { width: 9px; height: 9px; border-radius: 50%; background: rgba(255,255,255,.28); transition: all .5s; }
+.tb-dots button.on { width: 34px; border-radius: 6px; background: rgba(255,255,255,.9); }
+.tb-right { display: flex; align-items: center; gap: 34px; }
+.tb-clock { text-align: right; display: flex; flex-direction: column; gap: 2px; }
+.tb-clock b { font-weight: 300; font-size: 44px; line-height: 1; font-variant-numeric: tabular-nums; letter-spacing: .02em; }
+.tb-clock small { font-size: 14px; letter-spacing: .28em; text-transform: uppercase; opacity: .6; }
+.tb-sound { height: 48px; padding: 0 22px; border-radius: 24px; font-size: 15px; letter-spacing: .14em; text-transform: uppercase;
+  border: 1px solid rgba(255,255,255,.25); background: rgba(0,0,0,.25); transition: all .3s; }
+.tb-sound .snd-off { display: none; }
+body.muted .tb-sound .snd-on { display: none; } body.muted .tb-sound .snd-off { display: inline; }
+
+/* edge navigation (LEFT / RIGHT) */
+.edge { position: absolute; top: 50%; z-index: 25; transform: translateY(-50%); display: flex; align-items: center; gap: 14px; padding: 30px 26px;
+  font-size: 13px; letter-spacing: .4em; text-transform: uppercase; color: rgba(255,255,255,.55); opacity: .0; transition: opacity .6s; }
+.edge.prev { left: 0; } .edge.next { right: 0; }
+.edge i { width: 16px; height: 16px; border-left: 2px solid currentColor; border-bottom: 2px solid currentColor; }
+.edge.prev i { transform: rotate(45deg); } .edge.next i { transform: rotate(-135deg); }
+.edge span { writing-mode: vertical-rl; transform: rotate(180deg); }
+#app.show-edges .edge, body.pointer .edge { opacity: .85; }
+
+/* ---------------- focus ring (TV) ---------------- */
+.focusable-ring { position: relative; }
+[data-focus] { transition: transform .45s cubic-bezier(.2,.8,.2,1), box-shadow .45s, filter .45s; }
+[data-focus].is-focus { z-index: 12; }
+
+/* ---------------- open original (fallback) button ---------------- */
+.open-original { display: none; height: 46px; padding: 0 22px; border-radius: 23px; font-size: 14px; letter-spacing: .16em;
+  text-transform: uppercase; border: 1px solid rgba(255,255,255,.35); background: rgba(0,0,0,.4); white-space: nowrap; }
+.open-original.show { display: inline-flex; align-items: center; }
+
+/* fallback card in a featured screen */
+.feat-card { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
+  background: radial-gradient(ellipse at 50% 40%, rgba(255,255,255,.08), rgba(0,0,0,.9) 70%); text-align: center; }
+.feat-card b { font-size: 30px; font-weight: 600; }
+.feat-card span { font-size: 16px; opacity: .65; }
+
+/* ---------------- hint pill ---------------- */
+#hint { position: absolute; left: 50%; bottom: 26px; z-index: 30; transform: translateX(-50%); display: flex; gap: 30px; align-items: center;
+  padding: 12px 26px; border-radius: 30px; background: rgba(0,0,0,.55); border: 1px solid rgba(255,255,255,.12);
+  font-size: 15px; letter-spacing: .06em; color: rgba(255,255,255,.75); white-space: nowrap; transition: opacity .8s; }
+#hint.idle { opacity: 0; }
+#hint b { display: inline-block; min-width: 30px; padding: 2px 8px; margin-right: 8px; border-radius: 6px; text-align: center;
+  background: rgba(255,255,255,.14); color: #fff; font-weight: 600; font-size: 13px; letter-spacing: .08em; }
+
+/* ---------------- full-screen player ---------------- */
+#theatre { position: absolute; inset: 0; z-index: 60; background: #000; opacity: 0; visibility: hidden; transition: opacity .5s, visibility 0s .5s; }
+#theatre.open { opacity: 1; visibility: visible; transition: opacity .5s; }
+.th-media { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
+.th-media video { width: 100%; height: 100%; object-fit: contain; }
+.th-media .th-embed { position: relative; overflow: hidden; background: #000; }
+.th-ui { position: absolute; left: 0; right: 0; bottom: 0; padding: 120px 90px 60px; background: linear-gradient(0deg, rgba(0,0,0,.92), rgba(0,0,0,.6) 55%, transparent);
+  transition: opacity .6s, transform .6s; }
+#theatre.idle .th-ui { opacity: 0; transform: translateY(30px); }
+.th-title { font-size: 34px; font-weight: 300; letter-spacing: .04em; margin-bottom: 26px; }
+.th-progress { height: 5px; border-radius: 3px; background: rgba(255,255,255,.18); overflow: hidden; margin-bottom: 26px; }
+.th-progress i { display: block; height: 100%; width: 0; background: var(--accent, #fff); }
+.th-row { display: flex; align-items: center; justify-content: space-between; }
+.th-time { font-size: 20px; font-variant-numeric: tabular-nums; opacity: .8; min-width: 160px; }
+.th-buttons { display: flex; gap: 16px; }
+.th-btn { height: 64px; min-width: 120px; padding: 0 28px; border-radius: 32px; font-size: 19px; letter-spacing: .06em; text-align: center;
+  background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.18); transition: all .25s; }
+.th-btn.hidden { display: none; }
+.th-btn.is-focus { background: #fff; color: #000; transform: scale(1.06); border-color: #fff; }
+
+/* ---------------- veil, toast ---------------- */
+#veil { position: absolute; inset: 0; z-index: 50; pointer-events: none; opacity: 0; }
+#toast { position: absolute; left: 50%; top: 130px; z-index: 70; transform: translate(-50%, -20px); padding: 16px 30px; border-radius: 30px;
+  background: rgba(0,0,0,.8); border: 1px solid rgba(255,255,255,.18); font-size: 19px; letter-spacing: .04em; opacity: 0; transition: .45s; pointer-events: none; }
+#toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+/* ---------------- lighter effects for TV hardware ---------------- */
+body.lite .g-rain, body.lite .l-dust { display: none; }
+body.lite .world > .bg { filter: none !important; }
+body.lite * { backdrop-filter: none !important; }
+@media (prefers-reduced-motion: reduce) { * { animation-duration: .01s !important; animation-iteration-count: 1 !important; } }

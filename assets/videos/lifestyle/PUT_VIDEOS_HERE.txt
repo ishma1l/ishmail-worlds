@@ -1,0 +1,16 @@
+BUSINESS & LIFESTYLE — put your videos in this folder with these exact names.
+Any file here replaces that screen automatically. Missing files fall back to the built-in footage.
+Use MP4 (H.264). Landscape 1280x720 or 1920x1080 is ideal.
+
+  featured.mp4         The centre screen (your lifestyle reel is already here)
+  background.mp4       The room's blurred backdrop
+  collection-1.mp4     Right column, 1st frame (Horology)
+  collection-2.mp4     Right column, 2nd frame (Residence)
+  collection-3.mp4     Right column, 3rd frame (At sea)
+  collection-4.mp4     Right column, 4th frame (Private aviation)
+  collection-5.mp4     Wide strip under the centre screen (with the quote)
+  dest-dubai.mp4       Destination: Dubai
+  dest-maldives.mp4    Destination: Maldives
+  dest-amalfi.mp4      Destination: Amalfi
+  dest-newyork.mp4     Destination: New York
+  dest-london.mp4      Destination: London

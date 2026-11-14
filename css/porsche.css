@@ -1,0 +1,77 @@
+/* =============================================================
+   PORSCHE — a private design studio after hours
+   graphite, studio light, reflections, one signal red
+   ============================================================= */
+#app[data-world="porsche"] { --accent: #d5001c; }
+#app[data-world="porsche"] .tb-title { font: 200 40px/1 'Saira'; letter-spacing: .5em; color: #f4f4f4; }
+#app[data-world="porsche"] .tb-clock b { font-family: 'Saira'; font-weight: 200; }
+#app[data-world="porsche"] .tb-clock small { font-family: 'Saira'; }
+#app[data-world="porsche"] .tb-sound { font-family: 'Saira'; font-weight: 600; letter-spacing: .3em; font-size: 12px; }
+#app[data-world="porsche"] .tb-sound.is-focus { background: #fff; color: #000; }
+#app[data-world="porsche"] .edge { font-family: 'Saira'; }
+
+#w-porsche { background: #050505; }
+#w-porsche .bg { filter: brightness(.55) contrast(1.15) saturate(.85); transform: scale(1.05); }
+.p-shade { position: absolute; inset: 0; background:
+  linear-gradient(90deg, rgba(0,0,0,.55), rgba(0,0,0,.1) 40%, rgba(0,0,0,.25) 66%, rgba(0,0,0,.8)),
+  linear-gradient(180deg, rgba(0,0,0,.8), transparent 22%, transparent 70%, rgba(0,0,0,.9)); }
+
+/* ceiling light bars */
+.p-ceiling { position: absolute; left: 0; right: 0; top: 0; height: 120px; perspective: 600px; pointer-events: none; z-index: 1; }
+.p-ceiling i { position: absolute; left: 50%; height: 4px; border-radius: 2px; background: #fff; transform: translateX(-50%);
+  box-shadow: 0 0 22px 4px rgba(255,255,255,.55), 0 0 80px 18px rgba(255,255,255,.12); opacity: .85; }
+.p-ceiling i:nth-child(1) { top: 0; width: 1700px; height: 3px; opacity: .55; }
+.p-ceiling i:nth-child(n+2) { display: none; }
+.p-ceiling i:nth-child(2) { top: 40px; width: 1240px; opacity: .65; }
+.p-ceiling i:nth-child(3) { top: 58px; width: 1000px; opacity: .75; }
+.p-ceiling i:nth-child(4) { top: 72px; width: 790px; opacity: .6; }
+.p-ceiling i:nth-child(5) { top: 83px; width: 610px; opacity: .45; }
+
+/* floor: light streaks sliding toward you */
+.p-floor { position: absolute; left: -10%; right: -10%; bottom: -40px; height: 260px; perspective: 400px; pointer-events: none; z-index: 1; overflow: hidden; }
+.p-floor i { position: absolute; bottom: 0; width: 2px; height: 600px; transform-origin: 50% 100%; background: linear-gradient(0deg, rgba(255,255,255,.0), rgba(255,255,255,.35) 40%, transparent);
+  animation: streak 3.2s linear infinite; opacity: .5; }
+.p-floor i:nth-child(1) { left: 12%; transform: rotateX(80deg) rotateZ(28deg); animation-delay: -.4s; }
+.p-floor i:nth-child(2) { left: 25%; transform: rotateX(80deg) rotateZ(18deg); animation-delay: -1.6s; }
+.p-floor i:nth-child(3) { left: 38%; transform: rotateX(80deg) rotateZ(8deg); animation-delay: -2.4s; }
+.p-floor i:nth-child(4) { left: 50%; transform: rotateX(80deg); animation-delay: -.9s; background: linear-gradient(0deg, transparent, rgba(213,0,28,.7) 40%, transparent); }
+.p-floor i:nth-child(5) { left: 62%; transform: rotateX(80deg) rotateZ(-8deg); animation-delay: -2s; }
+.p-floor i:nth-child(6) { left: 75%; transform: rotateX(80deg) rotateZ(-18deg); animation-delay: -.2s; }
+.p-floor i:nth-child(7) { left: 88%; transform: rotateX(80deg) rotateZ(-28deg); animation-delay: -1.2s; }
+@keyframes streak { from { background-position: 0 0; height: 0; opacity: 0; } 30% { opacity: .55; } to { height: 900px; opacity: 0; } }
+
+/* hero display */
+.p-hero-wrap { position: absolute; left: 96px; top: 138px; width: 1150px; z-index: 5; }
+.p-hero { display: block; width: 1150px; height: 805px; border-radius: 20px; background: #000;
+  box-shadow: 0 0 0 1px rgba(255,255,255,.18), 0 50px 120px rgba(0,0,0,.9), 0 90px 120px -40px rgba(255,255,255,.06); }
+.p-hero .feat-media { border-radius: 20px; }
+.p-glass { position: absolute; inset: 0; z-index: 3; border-radius: 20px; pointer-events: none; overflow: hidden; }
+.p-glass::before { content: ''; position: absolute; top: -20%; bottom: -20%; width: 260px; left: -400px; transform: skewX(-18deg);
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.16), transparent); animation: glass 9s ease-in-out 2s infinite; }
+@keyframes glass { 0% { left: -400px; } 35%, 100% { left: 1400px; } }
+.p-hero.is-focus { transform: translateY(-6px); box-shadow: 0 0 0 2px #fff, 0 0 0 5px rgba(213,0,28,.9), 0 60px 130px rgba(0,0,0,.95), 0 0 80px rgba(213,0,28,.3); }
+#w-porsche .hero-cap { font: 600 22px 'Saira'; letter-spacing: .32em; text-transform: uppercase; padding: 80px 34px 30px; }
+
+/* progress of the hero film, drawn as a racing line */
+.p-track { position: relative; margin-top: 34px; height: 52px; display: flex; align-items: center; gap: 26px; }
+.p-track svg { flex: 1; height: 40px; overflow: visible; }
+.p-track-line { fill: none; stroke: rgba(255,255,255,.18); stroke-width: 2; }
+.p-track-done { fill: none; stroke: #d5001c; stroke-width: 3; filter: drop-shadow(0 0 6px rgba(213,0,28,.8)); }
+.p-car { fill: #fff; filter: drop-shadow(0 0 8px #fff); }
+.p-time { font: 300 22px 'Saira'; font-variant-numeric: tabular-nums; letter-spacing: .1em; color: rgba(255,255,255,.75); min-width: 140px; text-align: right; }
+.p-track.hidden svg, .p-track.hidden .p-time { visibility: hidden; }
+#w-porsche .open-original { font-family: 'Saira'; font-weight: 600; letter-spacing: .25em; font-size: 12px; }
+#w-porsche .open-original.is-focus { background: #fff; color: #000; }
+
+/* the stack of studio displays */
+.p-stack { position: absolute; left: 1320px; top: 132px; width: 500px; height: 920px; z-index: 6; perspective: 1600px; }
+.p-disp { position: absolute; left: 0; width: 500px; height: 281px; border-radius: 14px; background: #0a0a0a; transform-origin: 0 50%;
+  transform: rotateY(-16deg); box-shadow: 0 0 0 1px rgba(255,255,255,.14), -30px 30px 80px rgba(0,0,0,.85); filter: brightness(.82); }
+.p-disp:nth-child(1) { top: 0; z-index: 1; } .p-disp:nth-child(2) { top: 210px; z-index: 2; }
+.p-disp:nth-child(3) { top: 420px; z-index: 3; } .p-disp:nth-child(4) { top: 630px; z-index: 4; }
+.p-disp::after { content: ''; position: absolute; inset: 0; z-index: 2; border-radius: inherit; pointer-events: none;
+  background: linear-gradient(115deg, rgba(255,255,255,.16), transparent 28%), linear-gradient(0deg, rgba(0,0,0,.65), transparent 45%); }
+.p-cap { position: absolute; left: 24px; bottom: 18px; z-index: 3; font: 600 16px 'Saira'; letter-spacing: .32em; text-transform: uppercase; }
+.p-cap::before { content: ''; display: inline-block; width: 22px; height: 2px; margin-right: 14px; vertical-align: middle; background: #d5001c; }
+.p-disp.is-focus { z-index: 10; filter: none; transform: rotateY(-4deg) translateX(-40px) scale(1.08);
+  box-shadow: 0 0 0 2px #fff, -40px 40px 100px rgba(0,0,0,.95), 0 0 60px rgba(213,0,28,.25); }

@@ -1,0 +1,84 @@
+/* =============================================================
+   GOTHAM — a command cave looking out over a storm-lit city
+   steel blue, deep shadow, monitors with real feeds, rain, lights
+   ============================================================= */
+#app[data-world="gotham"] { --accent: #6fb2ff; }
+#app[data-world="gotham"] .tb-title { font: 700 46px/1 'Oswald'; letter-spacing: .06em; color: #eaf2ff; text-shadow: 0 0 30px rgba(80,150,255,.45); }
+#app[data-world="gotham"] .tb-clock b { font-family: 'Oswald'; font-weight: 300; }
+#app[data-world="gotham"] .tb-clock small { font-family: 'JetBrains Mono'; color: #9cc3f5; }
+#app[data-world="gotham"] .tb-sound { font-family: 'JetBrains Mono'; font-size: 13px; border-color: rgba(111,178,255,.4); color: #cfe3ff; }
+#app[data-world="gotham"] .tb-sound.is-focus { background: #6fb2ff; color: #02060e; border-color: #6fb2ff; box-shadow: 0 0 30px rgba(111,178,255,.6); }
+#app[data-world="gotham"] .edge { font-family: 'JetBrains Mono'; color: #9cc3f5; }
+
+#w-gotham { background: #01030a; }
+#w-gotham .bg { filter: saturate(.55) contrast(1.2) brightness(.62) hue-rotate(-12deg); transform: scale(1.08); animation: gDrift 40s ease-in-out infinite alternate; }
+@keyframes gDrift { to { transform: scale(1.16) translate(-20px, 10px); } }
+.g-grade { position: absolute; inset: 0; background:
+  radial-gradient(ellipse at 50% 45%, rgba(40,90,180,.18), transparent 60%),
+  linear-gradient(180deg, rgba(0,2,8,.75) 0%, rgba(0,2,8,.15) 30%, rgba(0,2,8,.35) 62%, rgba(0,2,8,.92) 82%); }
+.g-beam { position: absolute; bottom: 220px; width: 300px; height: 1300px; transform-origin: 50% 100%; pointer-events: none; mix-blend-mode: screen;
+  background: linear-gradient(0deg, rgba(210,228,255,.42), rgba(200,220,255,.10) 55%, transparent 85%); clip-path: polygon(47% 100%, 53% 100%, 100% 0, 0 0); filter: blur(5px); }
+.g-beam.a { left: 210px; animation: gs1 13s ease-in-out infinite alternate; }
+.g-beam.b { left: 1420px; animation: gs2 17s ease-in-out infinite alternate; }
+.g-beam.c { left: 860px; opacity: .55; animation: gs3 21s ease-in-out infinite alternate; }
+@keyframes gs1 { from { transform: rotate(-30deg); } to { transform: rotate(10deg); } }
+@keyframes gs2 { from { transform: rotate(26deg); } to { transform: rotate(-14deg); } }
+@keyframes gs3 { from { transform: rotate(-12deg); } to { transform: rotate(16deg); } }
+.g-rain { position: absolute; inset: 0; z-index: 3; pointer-events: none; opacity: .75; }
+.g-flash { position: absolute; inset: 0; z-index: 2; pointer-events: none; opacity: 0; mix-blend-mode: screen;
+  background: radial-gradient(ellipse at 60% 10%, rgba(215,230,255,.85), rgba(150,180,255,.2) 55%, transparent 75%); }
+.g-cave { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 4; pointer-events: none; }
+
+/* the command wall: a curved bank of screens */
+.g-wall { position: absolute; top: 132px; left: 0; right: 0; height: 700px; z-index: 6; display: flex; justify-content: center; align-items: flex-start;
+  gap: 38px; perspective: 2200px; }
+.g-wing { display: flex; flex-direction: column; gap: 28px; width: 480px; margin-top: 56px; transform-style: preserve-3d; }
+.g-wing.left { transform: rotateY(22deg); transform-origin: 100% 50%; }
+.g-wing.right { transform: rotateY(-22deg); transform-origin: 0 50%; }
+
+.mon { width: 480px; height: 270px; border-radius: 6px; background: #000;
+  box-shadow: 0 0 0 9px #070a10, 0 0 0 10px rgba(110,170,255,.28), 0 30px 70px rgba(0,0,0,.85), 0 0 60px rgba(40,100,220,.22); }
+.mon video { filter: saturate(.45) contrast(1.25) brightness(1.02) hue-rotate(-14deg); }
+.mon::before { content: ''; position: absolute; inset: 0; z-index: 2; pointer-events: none;
+  background: repeating-linear-gradient(0deg, rgba(0,0,0,.28) 0 1px, transparent 1px 3px),
+              radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,.65) 100%); }
+.mon::after { content: ''; position: absolute; inset: -50%; z-index: 2; pointer-events: none; opacity: .09;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation: grain .6s steps(4) infinite; }
+@keyframes grain { 25% { transform: translate(-4%, 3%); } 50% { transform: translate(3%, -5%); } 75% { transform: translate(-2%, 6%); } }
+.mon-label { position: absolute; left: 18px; bottom: 14px; z-index: 3; font: 500 14px 'JetBrains Mono'; letter-spacing: .22em; text-transform: uppercase; color: #d6e6ff;
+  text-shadow: 0 1px 4px #000; }
+.mon.is-focus { transform: translateZ(60px) scale(1.04);
+  box-shadow: 0 0 0 9px #0b1220, 0 0 0 12px #7cbcff, 0 40px 90px rgba(0,0,0,.9), 0 0 90px rgba(80,160,255,.55); }
+
+.g-center { display: flex; flex-direction: column; align-items: center; gap: 22px; }
+.g-hero { width: 700px; height: 672px; border-radius: 8px; background: #000;
+  box-shadow: 0 0 0 12px #060910, 0 0 0 13px rgba(130,185,255,.45), 0 50px 120px rgba(0,0,0,.95), 0 0 140px rgba(50,120,255,.35);
+  -webkit-box-reflect: below 26px linear-gradient(transparent 86%, rgba(255,255,255,.07)); }
+.g-hero .feat-media video { object-fit: contain; }
+.g-hero.is-focus { transform: scale(1.025);
+  box-shadow: 0 0 0 12px #08101d, 0 0 0 15px #8cc6ff, 0 50px 120px rgba(0,0,0,.95), 0 0 180px rgba(80,160,255,.6); }
+.hero-cap { position: absolute; left: 0; right: 0; bottom: 0; z-index: 3; padding: 60px 28px 22px; font-size: 22px; letter-spacing: .06em;
+  background: linear-gradient(0deg, rgba(0,0,0,.8), transparent); opacity: 0; transition: opacity .5s; pointer-events: none; }
+.featured.is-focus .hero-cap { opacity: 1; }
+#w-gotham .hero-cap { font: 500 22px 'Oswald'; letter-spacing: .12em; text-transform: uppercase; color: #eaf2ff; }
+#w-gotham .open-original { font-family: 'JetBrains Mono'; color: #cfe3ff; border-color: rgba(111,178,255,.45); }
+#w-gotham .open-original.is-focus { background: #6fb2ff; color: #02060e; }
+
+/* the desk: glossy console with a live map table */
+.g-desk { position: absolute; left: 0; right: 0; bottom: 0; height: 250px; z-index: 5; perspective: 900px;
+  background: linear-gradient(180deg, rgba(10,16,28,.0) 0%, rgba(6,10,18,.92) 22%, #02040a 100%); }
+.g-desk::before { content: ''; position: absolute; left: 6%; right: 6%; top: 50px; height: 1px; background: linear-gradient(90deg, transparent, rgba(120,180,255,.55), transparent); }
+.g-table { position: absolute; left: 50%; top: 40px; width: 1000px; height: 560px; margin-left: -500px; transform: rotateX(64deg); transform-origin: 50% 0;
+  border-radius: 8px; overflow: hidden; background: radial-gradient(ellipse at 50% 40%, rgba(20,60,120,.55), rgba(2,8,20,.9) 70%);
+  box-shadow: 0 0 0 1px rgba(110,170,255,.35), 0 0 80px rgba(40,110,255,.25); }
+.g-map { position: absolute; inset: 0; width: 100%; height: 100%; }
+.g-sweep { position: absolute; left: 50%; top: 50%; width: 1400px; height: 1400px; margin: -700px 0 0 -700px; border-radius: 50%;
+  background: conic-gradient(from 0deg, rgba(120,190,255,.38), transparent 40deg, transparent 360deg); animation: spin 7s linear infinite; mix-blend-mode: screen; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.g-wordmark { display: none; }
+
+.g-bats { position: absolute; inset: 0; z-index: 7; pointer-events: none; overflow: hidden; }
+.bat { position: absolute; width: 34px; height: 16px; }
+.bat svg { width: 100%; height: 100%; fill: #020306; animation: flap .22s ease-in-out infinite alternate; transform-origin: 50% 40%; }
+@keyframes flap { to { transform: scaleY(-.55); } }

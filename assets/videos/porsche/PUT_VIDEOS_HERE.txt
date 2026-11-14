@@ -1,0 +1,10 @@
+PORSCHE — put your videos in this folder with these exact names.
+Any file here replaces that screen automatically. Missing files fall back to the built-in footage.
+Use MP4 (H.264). Landscape 1280x720 or 1920x1080 is ideal.
+
+  featured.mp4         The big hero display (your Porsche reel is already here)
+  background.mp4       Full-screen studio backdrop
+  display-1.mp4        Right stack, 1st screen
+  display-2.mp4        Right stack, 2nd screen
+  display-3.mp4        Right stack, 3rd screen
+  display-4.mp4        Right stack, 4th screen

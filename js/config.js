@@ -1,87 +1,93 @@
 /* =====================================================================
-   ISHMAIL WORLDS — YOUR SETTINGS
-   Edit this file to change videos, featured reels and quotes.
-   Paths are relative to this folder (e.g. "media/city/my-clip.mp4").
+   ISHMAIL WORLDS — SETTINGS
+   ---------------------------------------------------------------------
+   HOW VIDEOS ARE CHOSEN (for every screen in the app):
+     1. Your own file in assets/videos/<world>/<slot>.mp4  ← always wins
+     2. Online footage (free licensed Pexels stock, listed below)
+     3. A built-in fallback loop in assets/fallback/ (works offline)
+   So to replace any screen, just save an MP4 with the slot's name, e.g.
+     assets/videos/porsche/display-2.mp4
+   Nothing else needs editing.
    ===================================================================== */
-window.WORLDS_CONFIG = {
+window.IW = {
   name: "ISHMAIL",
+  autoEnterWorld: "gotham",     // where the welcome sequence lands
+  autoEnterAfter: 9,            // seconds before it enters automatically
 
-  /* ---------------- WORLD 1: DARK CITY ---------------- */
-  city: {
-    featured: {
-      label: "FEATURED — THE BUTLER & THE HEIR",
-      platform: "tiktok",
-      url: "https://vm.tiktok.com/ZGdXxumXt/",
-      // TikTok only embeds with the long number from the full link (…/video/<number>).
-      tiktokId: "7541735536759786774",   // already filled in for you
-      aspect: 600 / 576,
-      // Optional: a copy of the clip saved on this computer plays offline instead of the embed.
-      localFile: "media/featured/city_featured.mp4",
-      qr: "media/qr/tiktok.png"
+  worlds: {
+    /* ------------------------------------------------ GOTHAM */
+    gotham: {
+      title: "GOTHAM",
+      featured: {
+        slot: "featured",                         // assets/videos/gotham/featured.mp4
+        caption: "Alfred & Bruce Wayne",
+        original: "https://vm.tiktok.com/ZGdXxumXt/",
+        platform: "TikTok",
+        tiktokId: "7541735536759786774",          // used only if the local file is missing
+        aspect: 600 / 576
+      },
+      background: { slot: "background", stock: "38421529/16316166_1280_720_25fps.mp4", fallback: "city_rain.mp4" },
+      screens: [
+        { slot: "feed-1", label: "Street level",  stock: "40863419/17464675_960_540_60fps.mp4",   fallback: "city_traffic.mp4" },
+        { slot: "feed-2", label: "Downpour",      stock: "12570193/12570193-sd_960_540_24fps.mp4", fallback: "city_rain.mp4" },
+        { slot: "feed-3", label: "From above",    stock: "9331341/9331341-sd_960_540_30fps.mp4",  fallback: "city_searchlight.mp4" },
+        { slot: "feed-4", label: "The storm",     stock: "39766683/16958216_960_540_30fps.mp4",   fallback: "city_searchlight.mp4" }
+      ]
     },
-    panels: [
-      { id: "cam1", title: "CAM 01 · ROOFTOP SWEEP", src: "media/city/city_searchlight.mp4" },
-      { id: "cam2", title: "CAM 04 · NORTH DISTRICT", src: "media/city/city_traffic.mp4" },
-      { id: "radar", title: "THERMAL GRID", src: "media/city/city_radar.mp4" },
-      // Your character edits — drop the files in media/city/ with these names (or change the names).
-      { id: "edit1", title: "EDIT 01", src: "media/city/edit1.mp4", fallback: "media/city/city_rain.mp4" },
-      { id: "edit2", title: "EDIT 02", src: "media/city/edit2.mp4", fallback: "media/city/city_searchlight.mp4" },
-      { id: "edit3", title: "EDIT 03", src: "media/city/edit3.mp4", fallback: "media/city/city_radar.mp4" }
-    ],
-    background: "media/city/city_rain.mp4",
-    // Replace with your own favourite lines.
-    quotes: [
-      { text: "The city never sleeps. Neither does the one who guards it.", by: "NIGHT FILE 01" },
-      { text: "Fear is only a signal. Learn to read it.", by: "NIGHT FILE 02" },
-      { text: "Every fall is training for the climb back up.", by: "NIGHT FILE 03" },
-      { text: "Be the quiet in the storm.", by: "NIGHT FILE 04" }
-    ]
+
+    /* ------------------------------------------------ PORSCHE */
+    porsche: {
+      title: "PORSCHE",
+      featured: {
+        slot: "featured",                         // assets/videos/porsche/featured.mp4
+        caption: "911 GT3 RS · after dark",
+        original: "https://www.instagram.com/reel/Dbi7uqvJABz/",
+        platform: "Instagram",
+        aspect: 1028 / 720
+      },
+      background: { slot: "background", stock: "29498824/12698131_1356_720_24fps.mp4", fallback: "drive_showroom.mp4" },
+      screens: [
+        { slot: "display-1", label: "911 Cabriolet",   stock: "8630304/8630304-sd_960_540_25fps.mp4", fallback: "drive_tunnel.mp4" },
+        { slot: "display-2", label: "356 Speedster",   stock: "31220482/13335333_960_540_24fps.mp4", fallback: "drive_bokeh.mp4" },
+        { slot: "display-3", label: "Rear wing",       stock: "5309344/5309344-sd_960_540_25fps.mp4", fallback: "drive_gauge.mp4" },
+        { slot: "display-4", label: "Coast road",      stock: "8630301/8630301-sd_960_540_25fps.mp4", fallback: "drive_tunnel.mp4" }
+      ]
+    },
+
+    /* ------------------------------------------------ BUSINESS & LIFESTYLE */
+    lifestyle: {
+      title: "BUSINESS & LIFESTYLE",
+      featured: {
+        slot: "featured",                         // assets/videos/lifestyle/featured.mp4
+        caption: "Night drive",
+        original: "https://www.instagram.com/reel/DeAEWPmNvNb/",
+        platform: "Instagram",
+        aspect: 1080 / 608
+      },
+      background: { slot: "background", stock: "34555902/14641676_1366_720_24fps.mp4", fallback: "empire_golden.mp4" },
+      // Destinations: the clock beside each one is the real local time there.
+      destinations: [
+        { slot: "dest-dubai",     name: "Dubai",     tz: "Asia/Dubai",       stock: "34529274/14629592_960_540_60fps.mp4",   fallback: "empire_golden.mp4" },
+        { slot: "dest-maldives",  name: "Maldives",  tz: "Indian/Maldives",  stock: "32192415/13728753_960_540_30fps.mp4",   fallback: "empire_ocean.mp4" },
+        { slot: "dest-amalfi",    name: "Amalfi",    tz: "Europe/Rome",      stock: "32778735/13972723_960_540_30fps.mp4",   fallback: "empire_ocean.mp4" },
+        { slot: "dest-newyork",   name: "New York",  tz: "America/New_York", stock: "12630512/12630512-sd_960_540_30fps.mp4", fallback: "empire_golden.mp4" },
+        { slot: "dest-london",    name: "London",    tz: "Europe/London",    stock: "5823343/5823343-sd_960_540_30fps.mp4",  fallback: "empire_golden.mp4" }
+      ],
+      screens: [
+        { slot: "collection-1", label: "Horology",       stock: "39108088/16639003_960_540_25fps.mp4",  fallback: "empire_watch.mp4" },
+        { slot: "collection-2", label: "Residence",      stock: "29466011/12684176_960_540_60fps.mp4",  fallback: "empire_architecture.mp4" },
+        { slot: "collection-3", label: "At sea",         stock: "37524012/15898409_960_540_60fps.mp4",  fallback: "empire_ocean.mp4" },
+        { slot: "collection-4", label: "Private aviation", stock: "28586474/12427473_960_540_24fps.mp4", fallback: "empire_architecture.mp4" },
+        { slot: "collection-5", label: "The city",       stock: "8477689/8477689-sd_960_540_30fps.mp4", fallback: "empire_architecture.mp4" }
+      ],
+      quotes: [
+        "Build quietly. Let the work make the noise.",
+        "Taste is a decision you make every single day.",
+        "Freedom is owning your mornings.",
+        "Go where the view is worth the climb."
+      ]
+    }
   },
 
-  /* ---------------- WORLD 2: DRIVE ---------------- */
-  drive: {
-    featured: {
-      label: "FEATURED REEL",
-      platform: "instagram",
-      url: "https://www.instagram.com/reel/Dbi7uqvJABz/",
-      aspect: 1028 / 720,   // shape of the video (width / height)
-      crop: true,           // trims Instagram's header/footer so only the video shows (press C to toggle)
-      localFile: "media/featured/drive_featured.mp4",
-      qr: "media/qr/drive.png"
-    },
-    panels: [
-      { id: "run", title: "NIGHT RUN", spec: "TUNNEL · 02:14", src: "media/drive/drive_tunnel.mp4" },
-      { id: "rev", title: "REV RANGE", spec: "PRESS R TO REV", src: "media/drive/drive_gauge.mp4" },
-      { id: "lights", title: "CITY LIGHTS", spec: "WET TARMAC", src: "media/drive/drive_bokeh.mp4" },
-      { id: "car1", title: "YOUR CLIP 01", spec: "YOUR FOOTAGE", src: "media/drive/car1.mp4", fallback: "media/drive/drive_showroom.mp4" }
-    ],
-    background: "media/drive/drive_showroom.mp4",
-    tagline: "Built for the long way home."
-  },
-
-  /* ---------------- WORLD 3: EMPIRE ---------------- */
-  empire: {
-    featured: {
-      label: "Featured Reel",
-      platform: "instagram",
-      url: "https://www.instagram.com/reel/DeAEWPmNvNb/",
-      aspect: 1276 / 718,
-      crop: true,
-      localFile: "media/featured/empire_featured.mp4",
-      qr: "media/qr/empire.png"
-    },
-    panels: [
-      { id: "coast", title: "The Coast", src: "media/empire/empire_ocean.mp4" },
-      { id: "time", title: "Time", src: "media/empire/empire_watch.mp4" },
-      { id: "form", title: "Form", src: "media/empire/empire_architecture.mp4" },
-      { id: "life1", title: "Your Clip", src: "media/empire/life1.mp4", fallback: "media/empire/empire_golden.mp4" }
-    ],
-    background: "media/empire/empire_golden.mp4",
-    quotes: [
-      { text: "Build quietly. Let the work make the noise.", by: "On ambition" },
-      { text: "Taste is a decision you make every single day.", by: "On craft" },
-      { text: "Freedom is owning your mornings.", by: "On time" },
-      { text: "Go where the view is worth the climb.", by: "On travel" }
-    ]
-  }
+  stockBase: "https://videos.pexels.com/video-files/"
 };

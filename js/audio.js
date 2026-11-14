@@ -105,7 +105,8 @@ window.Sound = (function () {
       engine = makeEngine(); const t = ctx.currentTime;
       // starter + catch + settle to idle
       engine.set(250, t, .01); engine.set(2600, t + .5, .12); engine.set(950, t + 1.4, .35);
-      engine.out.gain.setValueAtTime(.0001, t); engine.out.gain.exponentialRampToValueAtTime(.32, t + .6); engine.out.gain.exponentialRampToValueAtTime(.14, t + 2.2);
+      engine.out.gain.setValueAtTime(.0001, t); engine.out.gain.exponentialRampToValueAtTime(.32, t + .6); engine.out.gain.exponentialRampToValueAtTime(.12, t + 2.2);
+      engine.set(6800, t + 2.4, .25); engine.set(950, t + 3.3, .4); engine.out.gain.setTargetAtTime(.3, t + 2.4, .1); engine.out.gain.setTargetAtTime(.02, t + 3.6, 1.2);
     } else if (!on && engine) { engine.stop(); engine = null; }
   }
   function rev() {
@@ -141,10 +142,14 @@ window.Sound = (function () {
       env(g, t + i * .09, .01, .06 / (i + 1), 2.6); o.connect(g).connect(master); o.start(t); o.stop(t + 3.2); });
   }
 
+  let ducked = false;
+  function level() { return muted ? 0 : (ducked ? .12 : .8); }
+  try { muted = localStorage.getItem('iw-muted') === '1'; } catch (e) {}
   return {
+    duck(on) { ducked = on; if (master) master.gain.setTargetAtTime(level(), ctx.currentTime, .3); },
     init, tick, whoosh, boom, thunder, typeBlip, rev, chime,
-    world(name) { cityBed(name === 'city'); driveBed(name === 'drive'); empireBed(name === 'empire'); },
-    toggleMute() { muted = !muted; if (master) master.gain.setTargetAtTime(muted ? 0 : .8, ctx.currentTime, .1); return muted; },
+    world(name) { cityBed(name === 'gotham'); driveBed(name === 'porsche'); empireBed(name === 'lifestyle'); },
+    toggleMute() { muted = !muted; try { localStorage.setItem('iw-muted', muted ? '1' : '0'); } catch (e) {} if (master) master.gain.setTargetAtTime(level(), ctx.currentTime, .1); return muted; },
     get muted() { return muted; }, get running() { return ready(); }
   };
 })();
