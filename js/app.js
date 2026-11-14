@@ -18,8 +18,14 @@
   const tvLike = /Android|SMART-TV|SmartTV|GoogleTV|AFT|BRAVIA|CrKey|Tizen|Web0S|NetCast|Nebula/i.test(navigator.userAgent) && !/Mobile/i.test(navigator.userAgent);
   const lite = q.has('lite') || (!q.has('full') && (tvLike || (navigator.hardwareConcurrency || 8) <= 4 || (navigator.deviceMemory || 8) <= 2));
   if (lite) document.body.classList.add('lite');
-  Media.setBudget(lite ? 4 : 9);
+  Media.setBudget(lite ? 4 : 6);
   if (Sound.muted) document.body.classList.add('muted');
+  // self-tuning: if the screen can't keep up, switch to the lighter mode automatically
+  if (!q.has('full') && !lite) {
+    let frames = 0, t0 = 0; const probe = now => { if (!t0) t0 = now; frames++; if (now - t0 < 4000) requestAnimationFrame(probe);
+      else if (frames / 4 < 40) { document.body.classList.add('lite'); Media.setBudget(4); FX.stop('gold'); FX.stop('rain'); } };
+    setTimeout(() => requestAnimationFrame(probe), 12000);
+  }
 
   /* ---------------- clocks (real time, real places) ---------------- */
   const pad = n => String(n).padStart(2, '0');

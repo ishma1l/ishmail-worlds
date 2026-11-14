@@ -8,7 +8,7 @@
 .beams { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
 .beams i { position: absolute; top: -200px; width: 520px; height: 1500px; transform-origin: 50% 0;
   background: linear-gradient(180deg, rgba(255,246,228,.30), rgba(255,240,215,.08) 55%, transparent 85%);
-  clip-path: polygon(44% 0, 56% 0, 100% 100%, 0 100%); filter: blur(14px); opacity: 0; mix-blend-mode: screen; }
+  clip-path: polygon(44% 0, 56% 0, 100% 100%, 0 100%); opacity: 0; will-change: transform, opacity; }
 .beams i:nth-child(1) { left: 330px; --r0: 14deg; --r1: 6deg; }
 .beams i:nth-child(2) { left: 700px; --r0: 4deg; --r1: -3deg; width: 600px; }
 .beams i:nth-child(3) { left: 1050px; --r0: -6deg; --r1: 3deg; }
@@ -70,7 +70,7 @@
 
 /* each destination has its own identity */
 .d-gotham .door-media { clip-path: polygon(0 4%, 50% 0, 100% 4%, 100% 100%, 0 100%); }
-.d-gotham .door-media video { filter: saturate(.55) contrast(1.15) brightness(.9) hue-rotate(-8deg); }
+
 .d-gotham .door-name { font: 700 104px/1 'Oswald'; letter-spacing: .03em; color: #e8f1ff; text-shadow: 0 0 40px rgba(70,140,255,.6); }
 .d-gotham.sel { box-shadow: none; }
 .d-gotham.sel::before { content: ''; position: absolute; inset: -2px; clip-path: polygon(0 4%, 50% 0, 100% 4%, 100% 100%, 0 100%); background: #5aa2ff; z-index: -1;

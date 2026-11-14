@@ -26,7 +26,8 @@ window.Media = (function () {
   function bindSlot(el) {
     const [world, slot] = el.dataset.slot.split('/'); const spec = findSpec(world, slot);
     const v = el.tagName === 'VIDEO' ? el : el.querySelector('video');
-    if (spec && v) { load(v, chain(world, spec)); el.dataset.label = spec.label || spec.name || ''; }
+    if (spec && v) { load(v, chain(world, spec)); el.dataset.label = spec.label || spec.name || '';
+      if (el !== v) v.addEventListener('loadeddata', () => { el.dataset.kind = v.dataset.kind; }); }
     return spec;
   }
 
@@ -99,7 +100,7 @@ window.Media = (function () {
     const featV = worldEl.querySelector('.featured video');
     const focV = focusEl ? focusEl.querySelector && focusEl.querySelector('video') : null;
     const bg = worldEl.querySelector('.bg');
-    const order = [featV, focV, bg, ...all].filter((v, i, a) => v && a.indexOf(v) === i);
+    const order = [featV, focV, ...all.filter(v => v !== bg), bg].filter((v, i, a) => v && a.indexOf(v) === i);
     order.forEach((v, i) => {
       if (i < budget) { if (v.paused) v.play().catch(() => {}); }
       else if (!v.paused) v.pause();

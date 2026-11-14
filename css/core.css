@@ -117,3 +117,6 @@ body.lite * { backdrop-filter: none !important; }
 
 .edge span { display: none; }
 .edge { padding: 30px 16px; }
+
+/* your own footage plays clean: no caption over it */
+[data-kind="yours"] .mon-label, [data-kind="yours"] .p-cap, [data-kind="yours"] .l-cap { display: none; }

@@ -41,12 +41,12 @@ window.IW = {
       title: "PORSCHE",
       featured: {
         slot: "featured",                         // assets/videos/porsche/featured.mp4
-        caption: "911 GT3 RS · after dark",
+        caption: "911 GT3 RS",
         original: "https://www.instagram.com/reel/Dbi7uqvJABz/",
         platform: "Instagram",
-        aspect: 1028 / 720,
+        aspect: 16 / 9,
         // shown only if featured.mp4 is missing (Instagram embeds add white bars, so we never embed them)
-        standin: { label: "356 Speedster", stock: "31220482/13335333_960_540_24fps.mp4", fallback: "drive_showroom.mp4" }
+        standin: { label: "Tail lights", stock: "6157782/6157782-sd_960_540_30fps.mp4", fallback: "drive_showroom.mp4" }
       },
       background: { slot: "background", stock: "29498824/12698131_1356_720_24fps.mp4", fallback: "drive_showroom.mp4" },
       screens: [

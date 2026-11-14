@@ -13,7 +13,7 @@ window.FX = (function () {
   /* dust drifting through the welcome light shafts */
   function dust(canvas, name, opts = {}) {
     const c = canvas.getContext('2d'), W = canvas.width, H = canvas.height, P = [];
-    const n = LITE() ? (opts.lite || 40) : (opts.count || 160);
+    const n = LITE() ? (opts.lite || 40) : Math.min(opts.count || 160, 90);
     const col = opts.color || '255,240,215';
     for (let i = 0; i < n; i++) P.push({ x: Math.random() * W, y: Math.random() * H, r: Math.random() < .1 ? 3 + Math.random() * 7 : .6 + Math.random() * 1.8,
       vx: (Math.random() - .5) * .25, vy: -.08 - Math.random() * .3, p: Math.random() * 6.28 });
@@ -30,11 +30,12 @@ window.FX = (function () {
 
   /* rain with splashes along the console edge */
   function rain(canvas, name) {
-    const c = canvas.getContext('2d'), W = canvas.width, H = canvas.height, N = LITE() ? 120 : 380, D = [];
+    const c = canvas.getContext('2d'), W = canvas.width, H = canvas.height, N = LITE() ? 90 : 200, D = [];
     const nd = any => { const z = Math.random(); return { x: Math.random() * (W + 300) - 150, y: any ? Math.random() * H : -50 - Math.random() * 300, z, v: 16 + z * 24, l: 12 + z * 30 }; };
     for (let i = 0; i < N; i++) D.push(nd(true));
-    loop(name, dt => {
-      const k = dt / 16.7; c.clearRect(0, 0, W, H); c.lineCap = 'round';
+    let acc = 0;
+    loop(name, dt => {   // drawn at 30fps — looks the same, half the work
+      acc += dt; if (acc < 33) return; const k = acc / 16.7; acc = 0; c.clearRect(0, 0, W, H); c.lineCap = 'round';
       for (const d of D) {
         d.y += d.v * k; d.x += 2.4 * k * (.5 + d.z);
         c.strokeStyle = `rgba(195,220,255,${.10 + d.z * .32})`; c.lineWidth = .6 + d.z * 1.2;
