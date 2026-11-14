@@ -54,7 +54,7 @@ Tips: use MP4 (H.264). 720p or 1080p landscape works best. Labels, quotes and de
 **On the laptop (private version with your reels):** double-click **`Launch Ishmail Worlds.bat`**. It opens Chrome full-screen with sound allowed. Press **Alt+F4** to close it. To show it on the projector, cast the screen, or connect by HDMI and use the projector as the display.
 
 **On the projector's own browser:** open the web link in a TV browser (for example TV Bro or another Android TV browser), then press OK once. That first press turns on full-screen and sound, because browsers need one button press before they allow either.
-The public web link doesn't include your three reels, because they belong to other creators. There, those screens use the official embeds.
+The public web link doesn't include your three reels, because they belong to other creators. There, the Gotham screen uses TikTok's player, and the two Instagram screens play matching footage with an **Open on Instagram** button beneath them. Instagram's embed adds white bars, so it's never used.
 
 **Projector performance:** on TV hardware the app automatically switches to a lighter mode. It plays up to 4 videos at once (the main screen, the one you've selected and the backdrop come first) and drops the heavier effects. Add `?full` to the address to force all effects, or `?lite` to force the light mode on a laptop.
 

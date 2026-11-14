@@ -75,3 +75,6 @@
 .p-cap::before { content: ''; display: inline-block; width: 22px; height: 2px; margin-right: 14px; vertical-align: middle; background: #d5001c; }
 .p-disp.is-focus { z-index: 10; filter: none; transform: rotateY(-4deg) translateX(-40px) scale(1.08);
   box-shadow: 0 0 0 2px #fff, -40px 40px 100px rgba(0,0,0,.95), 0 0 60px rgba(213,0,28,.25); }
+
+.p-track svg { flex: 1 1 0; width: 0; min-width: 0; }
+.p-hero-wrap .p-track { width: 1150px; }
