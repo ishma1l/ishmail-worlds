@@ -321,7 +321,7 @@
     },
     showDoors() {
       if (this.doors) return; this.doors = true; clearTimeout(this.t1);
-      $('#intro').classList.add('doors-up'); this.select(this.sel, true);
+      $('#intro').classList.add('doors-up'); this.doorsAt = performance.now(); this.select(this.sel, true);
     },
     select(i, silent) {
       this.sel = (i + 3) % 3; $$('.door').forEach((d, k) => d.classList.toggle('sel', k === this.sel));
@@ -333,7 +333,9 @@
       this.timer = setTimeout(() => this.enter(), ms);
     },
     enter() {
-      if (state.screen !== 'intro' || this.entering) return; this.entering = true; clearTimeout(this.timer); clearTimeout(this.t1);
+      if (state.screen !== 'intro' || this.entering) return;
+      const wait = 1500 - (performance.now() - (this.doorsAt || 0)); if (wait > 0) { clearTimeout(this.timer); this.timer = setTimeout(() => this.enter(), wait); return; } // let the doors settle first
+      this.entering = true; clearTimeout(this.timer); clearTimeout(this.t1);
       const door = $$('.door')[this.sel], w = ORDER[this.sel];
       const r = door.getBoundingClientRect(), s = stage.getBoundingClientRect(), k = 1920 / s.width;
       const x = (r.left - s.left) * k, y = (r.top - s.top) * k, dw = r.width * k, dh = r.height * k;
