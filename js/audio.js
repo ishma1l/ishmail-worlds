@@ -101,7 +101,7 @@ window.Sound = (function () {
   }
   function driveBed(on) {
     if (!ctx) return;
-    if (on && !engine) {
+    if (on && false) {   // no engine sound effect
       engine = makeEngine(); const t = ctx.currentTime;
       // starter + catch + settle to idle
       engine.set(250, t, .01); engine.set(2600, t + .5, .12); engine.set(950, t + 1.4, .35);

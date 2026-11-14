@@ -341,18 +341,30 @@
       $('.it-1').innerHTML = [...s1].map((c, i) => `<span style="animation-delay:${(.3 + i * .05).toFixed(2)}s">${c === ' ' ? '&nbsp;' : c}</span>`).join('');
       $('.it-2').innerHTML = [...s2].map((c, i) => `<span style="animation-delay:${(1.1 + i * .08).toFixed(2)}s">${c}</span>`).join('');
       $('#intro').classList.add('play'); FX.start('introDust');
-      $$('#intro video').forEach(v => v.play().catch(() => {}));
-      this.t1 = setTimeout(() => this.showDoors(), 4300);
+      $$('.door video').forEach(v => v.play().catch(() => {}));
+      // the montage: your three reels, hard cuts
+      const reel = $$('.reel video'), starts = { gotham: 7, porsche: 3.5, lifestyle: .5 };
+      reel.forEach(v => { const w = v.dataset.intro, st = C.worlds[w];
+        Media.load(v, [`assets/videos/${w}/featured.mp4`, st.background.stock && C.stockBase + st.background.stock, `assets/fallback/${st.background.fallback}`].filter(Boolean));
+        v.addEventListener('loadedmetadata', () => { try { v.currentTime = v.dataset.kind === 'yours' ? starts[w] : 1; } catch (e) {} }, { once: true }); });
+      let k = 0; const cut = () => { reel.forEach((v, i) => { const on = i === k % 3; v.classList.toggle('on', on); on ? v.play().catch(() => {}) : v.pause(); }); k++; };
+      cut(); this.cutT = setInterval(cut, 950);
+      $('.knock-name').textContent = C.name;
+      setTimeout(() => { $('#intro').classList.add('name'); Sound.boom(); clearInterval(this.cutT); this.cutT = setInterval(cut, 700); }, 2900);
+      setTimeout(() => { $('#intro').classList.add('open'); }, 6200);
+      this.t1 = setTimeout(() => this.showDoors(), 6600);
     },
     showDoors() {
       if (this.doors) return; this.doors = true; clearTimeout(this.t1);
-      $('#intro').classList.add('doors-up'); this.doorsAt = performance.now(); this.select(this.sel, true);
+      $('#intro').classList.add('doors-up', 'name', 'open'); this.doorsAt = performance.now(); this.select(this.sel, true);
+      clearInterval(this.cutT); this.cutT = setInterval(() => { const r = $$('.reel video'), i = r.findIndex(v => v.classList.contains('on')), n = (i + 1) % 3;
+        r.forEach((v, j) => { v.classList.toggle('on', j === n); j === n ? v.play().catch(() => {}) : v.pause(); }); }, 2600);
     },
     select(i, silent) {
       this.sel = (i + 3) % 3; $$('.door').forEach((d, k) => d.classList.toggle('sel', k === this.sel));
       if (!silent) Sound.tick();
       // the timer restarts whenever you choose
-      clearTimeout(this.timer); const bar = $$('.door-timer i')[this.sel], ms = Math.max(3000, (C.autoEnterAfter - 4.3) * 1000);
+      clearTimeout(this.timer); const bar = $$('.door-timer i')[this.sel], ms = Math.max(3000, (C.autoEnterAfter - 6.6) * 1000);
       $$('.door-timer i').forEach(b => { b.style.transition = 'none'; b.style.width = '0'; });
       void bar.offsetWidth; bar.style.transition = `width ${ms}ms linear`; bar.style.width = '100%';
       this.timer = setTimeout(() => this.enter(), ms);
@@ -371,7 +383,7 @@
       setTimeout(() => {
         state.screen = 'world'; app.classList.add('on'); enterWorld(w, 0);
         $('#intro').classList.remove('active'); hint();
-        setTimeout(() => { FX.stop('introDust'); Media.pauseAll($('#intro')); }, 1200);
+        setTimeout(() => { FX.stop('introDust'); clearInterval(intro.cutT); Media.pauseAll($('#intro')); }, 1200);
       }, 1150);
     }
   };

@@ -12,7 +12,7 @@
 window.IW = {
   name: "ISHMAIL",
   autoEnterWorld: "gotham",     // where the welcome sequence lands
-  autoEnterAfter: 9,            // seconds before it enters automatically
+  autoEnterAfter: 12,           // seconds before it enters automatically
 
   worlds: {
     /* ------------------------------------------------ GOTHAM */
@@ -24,7 +24,7 @@ window.IW = {
         original: "https://vm.tiktok.com/ZGdXxumXt/",
         platform: "TikTok",
         tiktokId: "7541735536759786774",          // used only if the local file is missing
-        aspect: 600 / 576,
+        aspect: 1126 / 1080,
         playWithSound: true            // loops on the main screen with its own audio
       },
       background: { slot: "background", stock: "38421529/16316166_1280_720_25fps.mp4", fallback: "city_rain.mp4" },
@@ -65,7 +65,7 @@ window.IW = {
         caption: "Night drive",
         original: "https://www.instagram.com/reel/DeAEWPmNvNb/",
         platform: "Instagram",
-        aspect: 1080 / 608,
+        aspect: 16 / 9,
         standin: { label: "Grand touring", stock: "5309351/5309351-sd_960_540_25fps.mp4", fallback: "empire_golden.mp4" }
       },
       background: { slot: "background", stock: "34555902/14641676_1366_720_24fps.mp4", fallback: "empire_golden.mp4" },

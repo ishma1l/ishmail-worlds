@@ -92,3 +92,37 @@
 #intro.entering .intro-title { opacity: 0; }
 .door.zoom { transition: transform 1.25s cubic-bezier(.7,0,.2,1), filter 1s !important; z-index: 20; }
 .door.zoom .door-name, .door.zoom .door-timer { opacity: 0; transition: opacity .4s; }
+
+/* =============================================================
+   TITLE SEQUENCE (replaces the plain title card)
+   ============================================================= */
+.beams { display: none; }
+#intro { background: #000; }
+.reel { position: absolute; inset: 0; z-index: 1; overflow: hidden; }
+.reel video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transform: scale(1.12); }
+.reel video.on { opacity: 1; transform: scale(1); transition: transform 2.4s cubic-bezier(.2,.7,.2,1); }
+.reel-shade { position: absolute; inset: 0; z-index: 3; background: radial-gradient(ellipse at center, rgba(0,0,0,.25), rgba(0,0,0,.85)); transition: background 1.2s; pointer-events: none; }
+#intro.doors-up .reel-shade { background: rgba(0,0,0,.86); }
+
+/* the name, cut out of black so the footage plays inside the letters */
+.knock { position: absolute; inset: 0; z-index: 2; display: flex; align-items: center; justify-content: center; background: #000;
+  mix-blend-mode: multiply; opacity: 0; pointer-events: none; transform: scale(1.35); }
+.knock-name { font: 900 330px/1 'Inter'; letter-spacing: -.035em; color: #fff; padding-top: 70px; }
+#intro.name .knock { opacity: 1; transform: scale(1); transition: opacity .25s, transform 3.2s cubic-bezier(.12,.75,.2,1); }
+#intro.name .reel-shade { background: transparent; }
+#intro.open .knock { opacity: 0; transition: opacity 1.2s ease; }
+
+/* small line and flare above the big name */
+.intro-title { top: 300px; }
+.it-1 { color: #fff; }
+.it-2 { display: none; }
+#intro.name .intro-title { transform: translateY(-40px); }
+#intro.doors-up .intro-title { transform: translateY(-236px) scale(.6); }
+#intro.doors-up .it-2 { display: block; font-size: 150px; margin-top: 18px; }
+#intro.doors-up .it-2 span { animation: none !important; opacity: 1; transform: none; }
+
+/* cinema letterbox */
+.bars i { position: absolute; left: 0; right: 0; height: 0; background: #000; z-index: 9; transition: height 1s cubic-bezier(.7,0,.2,1); }
+.bars i:first-child { top: 0; } .bars i:last-child { bottom: 0; }
+#intro.play .bars i { height: 104px; }
+#intro.doors-up .bars i { height: 0; }

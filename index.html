@@ -5,12 +5,12 @@
 <title>Ishmail Worlds</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#000000">
-<link rel="stylesheet" href="css/fonts.css?v=1794683831">
-<link rel="stylesheet" href="css/core.css?v=1794683831">
-<link rel="stylesheet" href="css/intro.css?v=1794683831">
-<link rel="stylesheet" href="css/gotham.css?v=1794683831">
-<link rel="stylesheet" href="css/porsche.css?v=1794683831">
-<link rel="stylesheet" href="css/lifestyle.css?v=1794683831">
+<link rel="stylesheet" href="css/fonts.css?v=1794687402">
+<link rel="stylesheet" href="css/core.css?v=1794687402">
+<link rel="stylesheet" href="css/intro.css?v=1794687402">
+<link rel="stylesheet" href="css/gotham.css?v=1794687402">
+<link rel="stylesheet" href="css/porsche.css?v=1794687402">
+<link rel="stylesheet" href="css/lifestyle.css?v=1794687402">
 </head>
 <body>
 <div id="viewport">
@@ -18,13 +18,21 @@
 
   <!-- =========================== WELCOME =========================== -->
   <section id="intro" class="screen active">
-    <div class="beams"><i></i><i></i><i></i><i></i></div>
+    <!-- a film-style title sequence: your reels cut together, the name filled with footage -->
+    <div class="reel">
+      <video muted playsinline preload="auto" data-intro="gotham"></video>
+      <video muted playsinline preload="auto" data-intro="porsche"></video>
+      <video muted playsinline preload="auto" data-intro="lifestyle"></video>
+    </div>
+    <div class="knock"><span class="knock-name"></span></div>
+    <div class="reel-shade"></div>
     <canvas id="dust" width="1920" height="1080"></canvas>
     <div class="intro-title">
       <div class="it-1"></div>
       <div class="it-2"></div>
       <div class="it-flare"></div>
     </div>
+    <div class="bars"><i></i><i></i></div>
     <div class="doors">
       <button class="door d-gotham" data-world="gotham">
         <span class="door-media"><video muted loop playsinline data-slot="gotham/background"></video></span>
@@ -173,11 +181,11 @@
 </div>
 </div>
 
-<script src="js/config.js?v=1794683831"></script>
-<script src="js/audio.js?v=1794683831"></script>
-<script src="js/fx.js?v=1794683831"></script>
-<script src="js/media.js?v=1794683831"></script>
-<script src="js/remote.js?v=1794683831"></script>
-<script src="js/app.js?v=1794683831"></script>
+<script src="js/config.js?v=1794687402"></script>
+<script src="js/audio.js?v=1794687402"></script>
+<script src="js/fx.js?v=1794687402"></script>
+<script src="js/media.js?v=1794687402"></script>
+<script src="js/remote.js?v=1794687402"></script>
+<script src="js/app.js?v=1794687402"></script>
 </body>
 </html>
