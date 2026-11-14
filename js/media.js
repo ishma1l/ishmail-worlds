@@ -39,8 +39,8 @@ window.Media = (function () {
     const wrap = document.createElement('div'); wrap.style.cssText = 'position:absolute;inset:0;overflow:hidden;background:#000';
     const ifr = document.createElement('iframe'); ifr.tabIndex = -1; ifr.setAttribute('scrolling', 'no');
     ifr.allow = 'autoplay; encrypted-media; fullscreen; picture-in-picture'; ifr.referrerPolicy = 'strict-origin-when-cross-origin';
-    if (f.platform === 'TikTok') { ifr.src = tiktokUrl(f.tiktokId); ifr.style.cssText = 'position:absolute;left:-11%;top:-11%;width:122%;height:122%;border:0;pointer-events:none';
-      ifr.addEventListener('load', () => { const s = t => { try { ifr.contentWindow.postMessage({ type: t, 'x-tiktok-player': true }, '*'); } catch (e) {} }; s('mute'); s('play'); setTimeout(() => { s('mute'); s('play'); }, 1500); document.dispatchEvent(new CustomEvent('feat-ready', { detail: 'tiktok' })); }); }
+    if (f.platform === 'TikTok') { ifr.src = tiktokUrl(f.tiktokId); ifr.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;border:0;pointer-events:none';
+      ifr.addEventListener('load', () => { const s = t => { try { ifr.contentWindow.postMessage({ type: t, 'x-tiktok-player': true }, '*'); } catch (e) {} }; s('mute'); s('play'); document.dispatchEvent(new CustomEvent('feat-ready', { detail: 'tiktok' })); }); }
     else {
       ifr.src = igUrl(f.original);
       let vw = SW, vh = SW / f.aspect; if (vh > SH) { vh = SH; vw = SH * f.aspect; }
@@ -76,6 +76,15 @@ window.Media = (function () {
       s.addEventListener('exhausted', card, { once: true });
     }
   }
+  /* TikTok reports its state back; if unmuted autoplay got blocked (it pauses), go muted and keep playing */
+  window.addEventListener('message', e => {
+    if (!/tiktok\.com$/.test(new URL(e.origin).hostname)) return;
+    let d = e.data; if (typeof d === 'string') { try { d = JSON.parse(d); } catch (x) { return; } }
+    if (!d || d.type !== 'onStateChange') return;
+    const st = FEAT.gotham; if (!st || st.mode !== 'embed') return;
+    st.state = d.value;
+    if (d.value === 2 && !st.paused) { tiktok('gotham', 'mute'); tiktok('gotham', 'play'); st.needsTap = true; }
+  });
   /* TikTok's embed player accepts play/pause commands from the page */
   function tiktok(world, type) {
     const st = FEAT[world]; if (!st || !st.iframe || st.cfg.platform !== 'TikTok') return false;

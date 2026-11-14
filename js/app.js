@@ -181,11 +181,15 @@
   function heroAudio() {
     ORDER.forEach(w => {
       const st = Media.FEAT[w]; if (!st || !st.cfg.playWithSound) return;
-      if (st.mode === 'embed') { const want = state.screen === 'world' && state.world === w && !Sound.muted && !theatre.open && state.firstInput;
+      if (st.mode === 'embed') { const want = state.world === w && state.screen === 'world' && !Sound.muted && !theatre.open;
         Media.tiktok(w, 'play'); Media.tiktok(w, want ? 'unMute' : 'mute'); return; }
       if (st.mode !== 'local') return;
-      const v = st.video, want = state.screen === 'world' && state.world === w && !Sound.muted && !theatre.open && state.firstInput;
-      if (want) { v.muted = false; if (v.paused && !v.dataset.user) v.play().catch(() => { v.muted = true; v.play().catch(() => {}); }); }
+      const v = st.video, want = state.world === w && state.screen === 'world' && !Sound.muted && !theatre.open;
+      if (want) {
+        v.muted = false; if (v.paused && !v.dataset.user) v.play().catch(() => { v.muted = true; v.play().catch(() => {}); });
+        // browsers may refuse sound before the first button press: if it stopped, keep it playing silently until then
+        setTimeout(() => { if (v.paused && !v.dataset.user) { v.muted = true; v.play().catch(() => {}); } }, 400);
+      }
       else v.muted = true;
     });
   }
