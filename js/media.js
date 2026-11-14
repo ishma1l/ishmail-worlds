@@ -39,7 +39,7 @@ window.Media = (function () {
     const wrap = document.createElement('div'); wrap.style.cssText = 'position:absolute;inset:0;overflow:hidden;background:#000';
     const ifr = document.createElement('iframe'); ifr.tabIndex = -1; ifr.setAttribute('scrolling', 'no');
     ifr.allow = 'autoplay; encrypted-media; fullscreen; picture-in-picture'; ifr.referrerPolicy = 'strict-origin-when-cross-origin';
-    if (f.platform === 'TikTok') { ifr.src = tiktokUrl(f.tiktokId); ifr.style.cssText = 'position:absolute;left:-2%;top:-2%;width:104%;height:104%;border:0;pointer-events:none';
+    if (f.platform === 'TikTok') { ifr.src = tiktokUrl(f.tiktokId); ifr.style.cssText = 'position:absolute;left:-11%;top:-11%;width:122%;height:122%;border:0;pointer-events:none';
       ifr.addEventListener('load', () => { const s = t => { try { ifr.contentWindow.postMessage({ type: t, 'x-tiktok-player': true }, '*'); } catch (e) {} }; s('mute'); s('play'); setTimeout(() => { s('mute'); s('play'); }, 1500); document.dispatchEvent(new CustomEvent('feat-ready', { detail: 'tiktok' })); }); }
     else {
       ifr.src = igUrl(f.original);
